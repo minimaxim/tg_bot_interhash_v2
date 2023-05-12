@@ -129,6 +129,6 @@ class Calculator(BaseMixin, Base):
     __tablename__: str ='calculators'
 
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey('users.id', ondelete='NO ACTION'), nullable=True)
+    user_id = Column(BigInteger, nullable=True)
     asic_id = Column(SmallInteger, ForeignKey('asics.id', ondelete='NO ACTION'), nullable=True)
     kolvo = Column(SmallInteger, nullable=True)

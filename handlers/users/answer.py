@@ -52,15 +52,68 @@ def get_kol_vo():
 @user_answer_router.message(Text(text=get_list(), ignore_case=True))
 async def handle_message_click(message: Message):
 
+    x = message.text.split('/')
+    user = message.from_user.id
+    algo = x[1]
+
+
     await message.answer(
         text='Укажите количество:',
         reply_markup=kol_vo
     )
 
+    connect_to_db()
+
+    conn = connect_to_db()
+    cur = conn.cursor()
+
+    cur.execute("""SELECT id FROM asics where name = (%s)""", (algo,))
+    algo_id = cur.fetchall()[0][0]
+    conn.commit()
+
+    cur.execute("""SELECT user_id from calculators""")
+    us_in_db = cur.fetchall()
+    true_id = [row[0] for row in us_in_db]
+    conn.commit()
+
+    if user in true_id:
+        cur.execute("""UPDATE calculators SET asic_id = (%s) WHERE user_id = (%s)""",
+                    (algo_id, user))
+        conn.commit()
+    else:
+        cur.execute("""INSERT INTO calculators (asic_id, user_id) VALUES (%s, %s)""", (algo_id, user))
+        conn.commit()
+
+    cur.close()
+    conn.close()
+
 
 @user_answer_router.message(Text(text=get_kol_vo(), ignore_case=True))
 async def choose_num(message: Message):
     await message.answer(
-        text='Отлично, теперь ты точно знаешь, какое оборудование тебе необходимо. Перейдем к следкющему шагу.',
+        text='Отлично, теперь ты точно знаешь, какое оборудование тебе необходимо. Перейдем к следующему шагу.',
         reply_markup=main_panel
     )
+
+    user = message.from_user.id
+    kolvo = message.text
+
+    connect_to_db()
+
+    conn = connect_to_db()
+    cur = conn.cursor()
+
+    cur.execute("""UPDATE calculators SET kolvo = (%s) WHERE user_id = (%s)""",
+                (kolvo, user))
+    conn.commit()
+
+    cur.execute("""SELECT id FROM calculators WHERE user_id = (%s)""", (user,))
+    calculate_id = cur.fetchall()[0][0]
+    conn.commit()
+
+    cur.execute("""UPDATE users SET calculator_id = (%s) WHERE users.id = (%s)""",
+                (calculate_id, user))
+    conn.commit()
+
+    cur.close()
+    conn.close()

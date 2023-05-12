@@ -1,4 +1,4 @@
-from models import Start, Text, Category
+from models import Start
 
 
 async def main():
