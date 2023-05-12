@@ -51,8 +51,7 @@ async def handle_message_click(message: Message):
         await message.answer(text='Укажите количество:',
                              reply_markup=kol_vo)
 
-    elif message.text in list(str(range(1, 10))):
-        await message.answer(text='Укажите количествоdsaddas:',
-                             reply_markup=kol_vo)
+    else:
+        await message.answer(text='')
 
 
