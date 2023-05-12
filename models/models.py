@@ -104,6 +104,7 @@ class User(BaseMixin, Base):
     category_id = Column(SmallInteger, ForeignKey('categories.id', ondelete='NO ACTION'), nullable=True)
     brand_id = Column(SmallInteger, ForeignKey('brands.id', ondelete='NO ACTION'), nullable=True)
     model_id = Column(SmallInteger, ForeignKey('models.id', ondelete='NO ACTION'), nullable=True)
+    calculator_id = Column(SmallInteger, ForeignKey('calculators.id', ondelete='NO ACTION'), nullable=True)
 
     def __str__(self):
         return self.id
