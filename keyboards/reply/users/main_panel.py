@@ -7,7 +7,7 @@ main_panel = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(
-                text='У МЕНЯ ЕСТЬ ВОПРОС 🏦'
+                text='НАЖМИТЕ СЮДА 🏦'
             )
         ],
         # [

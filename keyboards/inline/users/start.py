@@ -7,22 +7,23 @@ from .general import UserCallbackData
 
 
 async def start_ikb() -> InlineKeyboardMarkup:
-    objs = await Start.all(is_published=True)
-    objs_iter = iter(objs)
-    objs_iter = list(map(list, zip_longest(*([objs_iter]*1))))
+    starts = await Start.all(is_published=True)
+    starts_iter = iter(starts)
+    starts_iter = map(list, zip_longest(*([starts_iter]*1)))
     buttons = [
         [
             InlineKeyboardButton(
-                text=obj.name.upper(),
+                text=start.name.upper(),
                 callback_data=UserCallbackData(
-                    target='sex',
+                    target='category',
                     action='get',
-                    sex_id=obj.id
+                    start_id=start.id
                 ).pack()
             )
-            for obj in line
-            if obj
+            for start in line
+            if start
         ]
-        for line in objs_iter
+        for line in starts_iter
     ]
+    # print(buttons)
     return InlineKeyboardMarkup(inline_keyboard=buttons)

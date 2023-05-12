@@ -1,14 +1,39 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-
-qurry = ReplyKeyboardMarkup(
-    one_time_keyboard=False,
+kol_vo = ReplyKeyboardMarkup(
+    one_time_keyboard=True,
     resize_keyboard=True,
     keyboard=[
         [
             KeyboardButton(
-                text=' ХОЧУ КУПИТЬ ОБОРУДОВАНИЕ 🏦'
+                text='1'
+            ),
+            KeyboardButton(
+                text='2'
+            ),
+            KeyboardButton(
+                text='3'
+            ),
+            KeyboardButton(
+                text='4'
+            ),
+            KeyboardButton(
+                text='5'
             )
+        ],
+        [
+            KeyboardButton(
+                text='6'
+            ),
+            KeyboardButton(
+                text='7'
+            ),
+            KeyboardButton(
+                text='8'
+            ),
+            KeyboardButton(
+                text='9'
+            )
+            ]
         ]
-    ]
 )
