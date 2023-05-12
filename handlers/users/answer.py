@@ -2,8 +2,10 @@ import os
 
 import psycopg2
 from aiogram import Router, F
+from aiogram.filters import Text
 from aiogram.types import Message
 
+from keyboards.reply.users import main_panel
 from keyboards.reply.users.qurry import kol_vo
 
 user_answer_router = Router(name='user_answer')
@@ -40,18 +42,25 @@ def get_list():
     return all_lists
 
 
-@user_answer_router.message(F.text)
+def get_kol_vo():
+
+    x = range(1,10)
+
+    return list(x)
+
+
+@user_answer_router.message(Text(text=get_list(), ignore_case=True))
 async def handle_message_click(message: Message):
 
-    all_units = get_list()
-
-    if message.text in all_units:
-        x = message.text
-
-        await message.answer(text='Укажите количество:',
-                             reply_markup=kol_vo)
-
-    else:
-        await message.answer(text='')
+    await message.answer(
+        text='Укажите количество:',
+        reply_markup=kol_vo
+    )
 
 
+@user_answer_router.message(Text(text=get_kol_vo(), ignore_case=True))
+async def choose_num(message: Message):
+    await message.answer(
+        text='Отлично, теперь ты точно знаешь, какое оборудование тебе необходимо. Перейдем к следкющему шагу.',
+        reply_markup=main_panel
+    )

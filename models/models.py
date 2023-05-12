@@ -100,6 +100,10 @@ class User(BaseMixin, Base):
     id = Column(BigInteger, primary_key=True)
     name = Column(VARCHAR(128), nullable=False)
     role_id = Column(SmallInteger, ForeignKey('roles.id', ondelete='NO ACTION'), nullable=True)
+    start_id = Column(SmallInteger, ForeignKey('start.id', ondelete='NO ACTION'), nullable=True)
+    category_id = Column(SmallInteger, ForeignKey('categories.id', ondelete='NO ACTION'), nullable=True)
+    brand_id = Column(SmallInteger, ForeignKey('brands.id', ondelete='NO ACTION'), nullable=True)
+    model_id = Column(SmallInteger, ForeignKey('models.id', ondelete='NO ACTION'), nullable=True)
 
     def __str__(self):
         return self.id
@@ -113,16 +117,17 @@ class Start(BaseMixin, Base):
     is_published = Column(Boolean, default=True, nullable=True)
 
 
-class Text(BaseMixin, Base):
-    __tablename__: str ='texts'
-
-    id = Column(SmallInteger, primary_key=True)
-    text = Column(VARCHAR(256), nullable=False)
-    is_published = Column(Boolean, default=True, nullable=True)
-
-
 class Asic(BaseMixin, Base):
     __tablename__: str ='asics'
 
     id = Column(SmallInteger, primary_key=True)
     name = Column(VARCHAR(128), nullable=False, unique=True)
+
+
+class Calculator(BaseMixin, Base):
+    __tablename__: str ='calculators'
+
+    id = Column(BigInteger, primary_key=True)
+    user_id = Column(BigInteger, ForeignKey('users.id', ondelete='NO ACTION'), nullable=True)
+    asic_id = Column(SmallInteger, ForeignKey('asics.id', ondelete='NO ACTION'), nullable=True)
+    kolvo = Column(SmallInteger, nullable=True)
