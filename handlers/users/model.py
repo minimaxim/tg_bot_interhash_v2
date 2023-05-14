@@ -20,7 +20,11 @@ async def get_model(callback: CallbackQuery, callback_data: UserCallbackData):
     conn = connect_to_db()
     cur = conn.cursor()
 
-    cur.execute(f"""UPDATE users SET brand_id = (%s) WHERE id = (%s)""", (brand, user))
+    cur.execute("""SELECT name FROM brands WHERE id = (%s)""", (brand,))
+    brand_name = cur.fetchall()[0][0]
+    conn.commit()
+
+    cur.execute(f"""UPDATE users SET brand_name = (%s) WHERE id = (%s)""", (brand_name, user))
     conn.commit()
 
     cur.close()
@@ -43,7 +47,11 @@ async def get_model(callback: CallbackQuery, callback_data: UserCallbackData):
         conn = connect_to_db()
         cur = conn.cursor()
 
-        cur.execute(f"""UPDATE users SET model_id = (%s) WHERE id = (%s)""", (model, user))
+        cur.execute("""SELECT name FROM models WHERE id = (%s)""", (model,))
+        model_name = cur.fetchall()[0][0]
+        conn.commit()
+
+        cur.execute(f"""UPDATE users SET model_name = (%s) WHERE id = (%s)""", (model_name, user))
         conn.commit()
 
         cur.close()

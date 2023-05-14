@@ -1,12 +1,11 @@
 import os
 
 import psycopg2
-from aiogram import Router, F
+from aiogram import Router
 from aiogram.filters import Text
 from aiogram.types import Message
 
 from keyboards.reply.users import main_panel
-from keyboards.reply.users.qurry import kol_vo
 
 user_answer_router = Router(name='user_answer')
 
@@ -44,7 +43,7 @@ def get_list():
 
 def get_kol_vo():
 
-    x = range(1,10)
+    x = range(1,100000)
 
     return list(x)
 
@@ -56,33 +55,39 @@ async def handle_message_click(message: Message):
     user = message.from_user.id
     algo = x[1]
 
-
-    await message.answer(
-        text='Укажите количество:',
-        reply_markup=kol_vo
-    )
+    if message.text in ['/SHA', '/Sia', '/Blake', '/Kadena', '/Handsnake']:
+        await message.answer(
+            text='Укажите хэшрейт (Th/s):',
+        )
+    elif message.text in ['/Scrypt', '/X11', '/Quark', '/Qubit', '/Myr', '/Skein', '/LBRY', '/Lyra2REv2', '/Keccak',
+                          '/Groestl', '/Eaglesong']:
+        await message.answer(
+            text='Укажите хэшрейт (Gh/s):',
+        )
+    elif message.text in ['/CryptoNight', '/CryptoNightSTC', '/Equihash', '/RandomX']:
+        await message.answer(
+            text='Укажите хэшрейт (kh/s):',
+        )
+    elif message.text in ['/BCD', '/Lyra2z']:
+        await message.answer(
+            text='Укажите хэшрейт (Mh/s):',
+        )
+    elif message.text in ['/Cuckatoo31', '/Cuckatoo32']:
+        await message.answer(
+            text='Укажите хэшрейт (h/s):',
+        )
+    else:
+        await message.answer(
+            text='Укажите хэшрейт:',
+        )
 
     connect_to_db()
 
     conn = connect_to_db()
     cur = conn.cursor()
 
-    cur.execute("""SELECT id FROM asics where name = (%s)""", (algo,))
-    algo_id = cur.fetchall()[0][0]
+    cur.execute("""UPDATE users SET asic_name = (%s) WHERE id = (%s)""", (algo, user))
     conn.commit()
-
-    cur.execute("""SELECT user_id from calculators""")
-    us_in_db = cur.fetchall()
-    true_id = [row[0] for row in us_in_db]
-    conn.commit()
-
-    if user in true_id:
-        cur.execute("""UPDATE calculators SET asic_id = (%s) WHERE user_id = (%s)""",
-                    (algo_id, user))
-        conn.commit()
-    else:
-        cur.execute("""INSERT INTO calculators (asic_id, user_id) VALUES (%s, %s)""", (algo_id, user))
-        conn.commit()
 
     cur.close()
     conn.close()
@@ -103,16 +108,7 @@ async def choose_num(message: Message):
     conn = connect_to_db()
     cur = conn.cursor()
 
-    cur.execute("""UPDATE calculators SET kolvo = (%s) WHERE user_id = (%s)""",
-                (kolvo, user))
-    conn.commit()
-
-    cur.execute("""SELECT id FROM calculators WHERE user_id = (%s)""", (user,))
-    calculate_id = cur.fetchall()[0][0]
-    conn.commit()
-
-    cur.execute("""UPDATE users SET calculator_id = (%s) WHERE users.id = (%s)""",
-                (calculate_id, user))
+    cur.execute("""UPDATE users SET kolvo = (%s) WHERE id = (%s)""", (kolvo, user))
     conn.commit()
 
     cur.close()

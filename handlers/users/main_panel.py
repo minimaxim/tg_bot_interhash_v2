@@ -1,7 +1,7 @@
 from aiogram import F, Router
 from aiogram.types import Message
 from models import User
-from keyboards.reply.users import main_panel, qurry
+from keyboards.reply.users import main_panel
 
 user_main_router = Router(name='user_main_panel')
 

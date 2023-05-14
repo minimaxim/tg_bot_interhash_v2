@@ -20,21 +20,17 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData):
     conn = connect_to_db()
     cur = conn.cursor()
 
-    cur.execute(f"""UPDATE users SET category_id = (%s) WHERE id = (%s)""", (category, user))
+    cur.execute("""SELECT name FROM categories WHERE id = (%s)""", (category,))
+    category_name = cur.fetchall()[0][0]
+    conn.commit()
+
+    cur.execute(f"""UPDATE users SET category_name = (%s) WHERE id = (%s)""", (category_name, user))
     conn.commit()
 
     cur.close()
     conn.close()
 
-    if callback_data.videocard_id != 0 and callback_data.videocard_id != None:
-        await callback.message.edit_text(
-            text='Отлично, теперь ты точно знаешь, какое оборудование тебе необходимо. Перейдем к следующему шагу.'
-        )
-        await callback.message.answer(
-            text='Нужен ли вам хостинг?',
-            reply_markup=await brand_paginator_ikb(callback_data=callback_data)
-        )
-    elif callback_data.category_id == 1:
+    if callback_data.category_id == 1:
 
         parse_and_save()
 

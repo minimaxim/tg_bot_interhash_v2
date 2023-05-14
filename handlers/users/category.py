@@ -20,7 +20,11 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
     conn = connect_to_db()
     cur = conn.cursor()
 
-    cur.execute(f"""UPDATE users SET start_id = (%s) WHERE id = (%s)""", (start, user))
+    cur.execute("""SELECT name FROM start WHERE id = (%s)""", (start,))
+    start_name = cur.fetchall()[0][0]
+    conn.commit()
+
+    cur.execute("""UPDATE users SET start_name = (%s) WHERE id = (%s)""", (start_name, user))
     conn.commit()
 
     cur.close()

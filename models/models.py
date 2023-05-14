@@ -81,30 +81,17 @@ class Model(BaseMixin, Base):
         return self.name
 
 
-class Role(BaseMixin, Base):
-    __tablename__: str = 'roles'
-
-    id = Column(SmallInteger, primary_key=True)
-    role = Column(VARCHAR(10), unique=True, nullable=False)
-
-    def __str__(self):
-        return self.role
-
-    async def users(self) -> list['User']:
-        return await User.all(role_id=self.id)
-
-
 class User(BaseMixin, Base):
     __tablename__: str = 'users'
 
     id = Column(BigInteger, primary_key=True)
     name = Column(VARCHAR(128), nullable=False)
-    role_id = Column(SmallInteger, ForeignKey('roles.id', ondelete='NO ACTION'), nullable=True)
-    start_id = Column(SmallInteger, ForeignKey('start.id', ondelete='NO ACTION'), nullable=True)
-    category_id = Column(SmallInteger, ForeignKey('categories.id', ondelete='NO ACTION'), nullable=True)
-    brand_id = Column(SmallInteger, ForeignKey('brands.id', ondelete='NO ACTION'), nullable=True)
-    model_id = Column(SmallInteger, ForeignKey('models.id', ondelete='NO ACTION'), nullable=True)
-    calculator_id = Column(SmallInteger, ForeignKey('calculators.id', ondelete='NO ACTION'), nullable=True)
+    start_name = Column(VARCHAR(128), nullable=True)
+    category_name = Column(VARCHAR(128), nullable=True)
+    brand_name = Column(VARCHAR(128), nullable=True)
+    model_name = Column(VARCHAR(128), nullable=True)
+    asic_name = Column(VARCHAR(128), nullable=True)
+    kolvo = Column(SmallInteger, nullable=True)
 
     def __str__(self):
         return self.id
@@ -122,13 +109,5 @@ class Asic(BaseMixin, Base):
     __tablename__: str ='asics'
 
     id = Column(SmallInteger, primary_key=True)
-    name = Column(VARCHAR(128), nullable=False, unique=True)
-
-
-class Calculator(BaseMixin, Base):
-    __tablename__: str ='calculators'
-
-    id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, nullable=True)
-    asic_id = Column(SmallInteger, ForeignKey('asics.id', ondelete='NO ACTION'), nullable=True)
-    kolvo = Column(SmallInteger, nullable=True)
+    name = Column(VARCHAR(128), nullable=True)
+    rate = Column(VARCHAR(128), nullable=True)
