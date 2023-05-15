@@ -1,5 +1,13 @@
 import os
+import time
 
+import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 import psycopg2
 from aiogram import Router
 from aiogram.filters import Text
@@ -111,5 +119,61 @@ async def choose_num(message: Message):
     cur.execute("""UPDATE users SET kolvo = (%s) WHERE id = (%s)""", (kolvo, user))
     conn.commit()
 
+    cur.execute("""SELECT asic_name FROM users WHERE id = (%s)""", (user,))
+    asic = cur.fetchall()[0][0]
+    conn.commit()
+
     cur.close()
     conn.close()
+
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+
+    driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
+
+    url = 'https://whattomine.com/asic'
+
+    try:
+        driver.get(url)
+
+        time.sleep(2)
+
+        span_element = driver.find_element(By.XPATH, "//input[@data-target=hashrate]")
+
+    finally:
+        driver.quit()
+
+    # target_span = soup.find('span', {'class': 'btn btn-default', 'data-bs-content': f"Include {asic}"})
+    #
+    # target_col_sm = target_span.find_parent('div', {'class': 'col-sm'})
+    #
+    # hashrate_input = driver.find_element(By.CLASS_NAME, 'form-control resets-adapt')
+    # print(hashrate_input)
+    # hashrate_input.clear()
+    # hashrate_input.send_keys(kolvo)
+
+
+
+    # hashrate_input = target_col_sm.find('input', {'class': 'form-control resets-adapt'})
+    #
+    # print(hashrate_input)
+
+    # hashrate_input['value'] = kolvo
+
+
+
+    #
+    # driver.implicitly_wait(10)
+    #
+    # page_content = driver.page_source
+    #
+    # soup = BeautifulSoup(page_content, 'html.parser')
+    #
+    # result_table = soup.find('table', {'class': 'table-sm'})
+    #
+    # table_image = driver.find_element_by_xpath('//table').screenshot_as_png
+    #
+    # with open('table.png', 'wb') as f:
+    #     f.write(table_image)
+    #
+

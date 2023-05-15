@@ -59,7 +59,6 @@ def insert_asic(new_asic):
     conn.close()
 
 
-
 def parse_and_save():
     new_asic = parser_asic()
     insert_asic(new_asic)

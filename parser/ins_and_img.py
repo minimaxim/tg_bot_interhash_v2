@@ -2,11 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 chrome_options = Options()
 chrome_options.add_argument('--headless')
 
-driver = webdriver.Chrome(chrome_options=chrome_options)
+driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
 
 url = 'https://whattomine.com/asic'
 
@@ -15,11 +18,13 @@ page_content = response.content
 
 soup = BeautifulSoup(page_content, 'html.parser')
 
-form = soup.find('form', {'class': 'form-horizontal'})
+asics = soup.find_all("div", {"class": "col-sm"})
 
-asic_type_select = form.find('select', {'name': 'algo'})
+asic_name = asics.find('SHA-256')
 
-asic_type_option = asic_type_select.find('option', {'value': 'sha-256'})
+
+print(asics)
+
 asic_type_option['selected'] = True
 
 hashrate_input = form.find('input', {'id': 'hr'})
