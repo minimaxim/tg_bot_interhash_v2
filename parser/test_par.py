@@ -34,7 +34,15 @@ def parser_asic():
 
     for y in asics_list:
         if y not in not_accept:
-            new_asics_list.append(y)
+            if y == 'SHA-256':
+                new_asics_list.append('SHA256')
+            elif y == 'Myr-Groestl':
+                new_asics_list.append('MyrGroestl')
+            elif y == 'Blake (14r)':
+                new_asics_list.append('Blake14r')
+            elif y != 'SHA-256' or y != 'Myr-Groestl' or y != 'Blake (14r)':
+                new_asics_list.append(y)
+
 
     return new_asics_list
 
