@@ -111,3 +111,11 @@ class Asic(BaseMixin, Base):
     id = Column(SmallInteger, primary_key=True)
     name = Column(VARCHAR(128), nullable=True)
     rate = Column(VARCHAR(128), nullable=True)
+
+
+class Photo(BaseMixin, Base):
+    __tablename__: str ='photos'
+
+    id = Column(SmallInteger, primary_key=True)
+    image = Column(VARCHAR(128), nullable=True)
+    asic_id = Column(SmallInteger, ForeignKey('asics.id', ondelete='CASCADE'), nullable=True)
