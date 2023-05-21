@@ -3,8 +3,7 @@ from aiogram.types import CallbackQuery
 
 from keyboards.inline.users import brand_paginator_ikb, all_list_ikb
 from keyboards.inline.users.general import UserCallbackData
-from models.models import Asic
-from parser.test_par import parse_and_save, connect_to_db
+from parser.connection import connect_to_db
 
 user_brand_router = Router(name='user_brand')
 
@@ -31,8 +30,6 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData):
     conn.close()
 
     if callback_data.category_id == 1:
-
-        parse_and_save()
 
         asics = await Asic.all()
 

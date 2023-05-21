@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 
 from keyboards.inline.users import model_paginator_ikb
 from keyboards.inline.users.general import UserCallbackData
-from parser.test_par import connect_to_db
+from parser.connection import connect_to_db
 
 user_model_router = Router(name='user_model')
 

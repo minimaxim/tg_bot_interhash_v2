@@ -1,16 +1,19 @@
-from aiogram import Router, F, types
-from aiogram.types import CallbackQuery, message
+from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery
 
-from keyboards.inline.users import category_paginator_ikb, all_list_ikb
+from handlers.users.formilize import Form
+from keyboards.inline.users import category_paginator_ikb
 from keyboards.inline.users.general import UserCallbackData
-from models.models import Asic
-from parser.test_par import parse_and_save, connect_to_db
+from keyboards.reply.users.walet import walet_panel
+
+from parser.connection import connect_to_db
 
 user_category_router = Router(name='user_category')
 
 
 @user_category_router.callback_query(UserCallbackData.filter((F.target == 'category') & (F.action == 'get')))
-async def paginate_categories(callback: CallbackQuery, callback_data: UserCallbackData):
+async def paginate_categories(callback: CallbackQuery, callback_data: UserCallbackData, state: FSMContext) -> None:
 
     connect_to_db()
 
@@ -37,18 +40,12 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
         )
     elif callback_data.start_id == 4:
 
-        parse_and_save()
-
-        asics = await Asic.all()
-
-        text = '\n\nASIC алгоритмы:\n'
-        for asic in asics:
-            text += f'/{asic.name} '
-
-        await callback.message.edit_text(
-            text=text.strip(),
-            reply_markup= await all_list_ikb(callback_data=callback_data)
+        await state.set_state(Form.cost_electr)
+        await callback.message.answer(
+            text='Выберите валюту для рассчета',
+            reply_markup=walet_panel
         )
+
     else:
         await callback.message.edit_text(
             text='Знаете ли вы какое оборудование вам необходимо?',

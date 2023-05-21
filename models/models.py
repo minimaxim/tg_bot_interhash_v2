@@ -90,8 +90,11 @@ class User(BaseMixin, Base):
     category_name = Column(VARCHAR(128), nullable=True)
     brand_name = Column(VARCHAR(128), nullable=True)
     model_name = Column(VARCHAR(128), nullable=True)
-    asic_name = Column(VARCHAR(128), nullable=True)
-    kolvo = Column(SmallInteger, nullable=True)
+    currency = Column(VARCHAR(5), nullable=True)
+    cost_electricity = Column(VARCHAR(128), nullable=True)
+    hash = Column(VARCHAR(128), nullable=True)
+    potreb = Column(VARCHAR(128), nullable=True)
+    komm = Column(VARCHAR(128), nullable=True)
 
     def __str__(self):
         return self.id
@@ -104,18 +107,3 @@ class Start(BaseMixin, Base):
     name = Column(VARCHAR(128), nullable=False)
     is_published = Column(Boolean, default=True, nullable=True)
 
-
-class Asic(BaseMixin, Base):
-    __tablename__: str ='asics'
-
-    id = Column(SmallInteger, primary_key=True)
-    name = Column(VARCHAR(128), nullable=True)
-    rate = Column(VARCHAR(128), nullable=True)
-
-
-class Photo(BaseMixin, Base):
-    __tablename__: str ='photos'
-
-    id = Column(SmallInteger, primary_key=True)
-    image = Column(VARCHAR(128), nullable=True)
-    asic_id = Column(SmallInteger, ForeignKey('asics.id', ondelete='CASCADE'), nullable=True)

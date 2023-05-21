@@ -10,20 +10,5 @@ main_panel = ReplyKeyboardMarkup(
                 text='НАЖМИТЕ СЮДА 🏦'
             )
         ],
-        # [
-        #     KeyboardButton(
-        #         text='КАЛЬКУЛЯТОР ДОХОДНОСТИ 🏦'
-        #     )
-        # ],
-        # [
-        #     KeyboardButton(
-        #         text='ХОЧУ КУПИТЬ ОБОРУДОВАНИЕ 🏦'
-        #     ),
-        # ],
-        # [
-        #     KeyboardButton(
-        #         text=' ИНДИВИДУАЛЬНАЯ КОНСУЛЬТАЦИЯ 🏦'
-        #     )
-        # ]
     ]
 )
