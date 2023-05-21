@@ -79,7 +79,7 @@ async def get_hash(message: Message, state: FSMContext) -> None:
     await state.set_state(Form.potr_electr)
 
     await message.answer(
-            text='Укажите хешрейт (Th/s)',
+            text='Укажите хешрейт (Th/s)':,
             reply_markup=main_panel
         )
 
@@ -104,7 +104,7 @@ async def get_potr(message: Message, state: FSMContext) -> None:
     await state.set_state(Form.comm_pull)
 
     await message.answer(
-            text='Укажите потребление (Ватт)',
+            text='Укажите потребление (Ватт):',
             reply_markup=main_panel
         )
 
@@ -129,7 +129,7 @@ async def get_comm(message: Message, state: FSMContext) -> None:
     await state.set_state(Form.finish)
 
     await message.answer(
-            text='Укажите комиссию пула (%)',
+            text='Укажите комиссию пула (%):',
             reply_markup=main_panel
         )
 
@@ -153,7 +153,7 @@ async def get_final(message: Message, state: FSMContext) -> None:
     await state.update_data(potr_electr=message.text)
 
     await message.answer(
-        text='Происходит расчет, пожалуйста, подождите',
+        text='Происходит расчет, пожалуйста, подождите...',
         reply_markup=main_panel
     )
 
@@ -197,10 +197,22 @@ async def get_all(message: Message):
 
 
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
 
     driver = webdriver.Chrome(options=chrome_options)
     driver.get("https://ultramining.com/crypto-calc/bitcoin/")
+
+    if currency == 'USA':
+        driver.find_element(By.CLASS_NAME, 'input-group-append').click()
+        time.sleep(2)
+        driver.find_element(By.XPATH, "//*[@id='content']/div[2]/div[2]/div[1]/div/div/div/div[1]").click()
+        time.sleep(1)
+    else:
+        pass
+
+    price = driver.find_element(By.XPATH, "//*[@id='input-electricity']", )
+    price.clear()
+    price.send_keys(cost_electricity)
 
     price = driver.find_element(By.XPATH, "//*[@id='input-electricity']", )
     price.clear()
