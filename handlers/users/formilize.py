@@ -79,7 +79,7 @@ async def get_hash(message: Message, state: FSMContext) -> None:
     await state.set_state(Form.potr_electr)
 
     await message.answer(
-            text='Укажите хешрейт (Th/s)':,
+            text='Укажите хешрейт (Th/s):',
             reply_markup=main_panel
         )
 
