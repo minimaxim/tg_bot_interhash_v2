@@ -232,7 +232,6 @@ async def get_all(message: Message):
 
     time.sleep(3)
 
-    table_data = []
     rows = driver.find_element(By.CLASS_NAME, 'dataTables_scrollBody')
 
     row_body = rows.find_element(By.TAG_NAME, 'tbody')
