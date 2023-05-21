@@ -1,15 +1,15 @@
 import time
-import urllib
 
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.methods import SendPhoto
-from aiogram.types import Message, InputFile, FSInputFile
+from aiogram.types import Message, FSInputFile
+
+from keyboards.inline.users import brand_paginator_ikb
+from keyboards.inline.users.general import UserCallbackData
 from keyboards.reply.users import main_panel
-from loader import bot
 from parser.connection import connect_to_db
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -161,7 +161,7 @@ async def get_final(message: Message, state: FSMContext) -> None:
 
 
 @user_fromilize_router.message()
-async def get_all(message: Message):
+async def get_all(message: Message, callback_data: UserCallbackData):
 
     connect_to_db()
 

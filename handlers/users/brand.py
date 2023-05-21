@@ -1,15 +1,19 @@
 from aiogram import Router, F
+from aiogram.filters import state
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
+from handlers.users.formilize import Form
 from keyboards.inline.users import brand_paginator_ikb, all_list_ikb
 from keyboards.inline.users.general import UserCallbackData
+from keyboards.reply.users import walet_panel
 from parser.connection import connect_to_db
 
 user_brand_router = Router(name='user_brand')
 
 
 @user_brand_router.callback_query(UserCallbackData.filter((F.target == 'brand') & (F.action == 'get')))
-async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData):
+async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData, state: FSMContext) -> None:
 
     connect_to_db()
 
@@ -31,15 +35,10 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData):
 
     if callback_data.category_id == 1:
 
-        asics = await Asic.all()
-
-        text = '\n\nASIC алгоритмы:\n'
-        for asic in asics:
-            text += f'/{asic.name} '
-
-        await callback.message.edit_text(
-            text=text.strip(),
-            reply_markup=await all_list_ikb(callback_data=callback_data)
+        await state.set_state(Form.cost_electr)
+        await callback.message.answer(
+            text='Выберите валюту для рассчета',
+            reply_markup=walet_panel
         )
         
     elif callback_data.category_id == 2:
