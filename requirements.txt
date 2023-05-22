@@ -9,3 +9,5 @@ httpx==0.24.0
 SQLAlchemy==2.0.9
 telegraph==2.2.0
 python-dotenv==1.0.0
+selenium==4.9.1
+pandas==2.0.1

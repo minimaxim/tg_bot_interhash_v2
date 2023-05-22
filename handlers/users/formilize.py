@@ -161,7 +161,7 @@ async def get_final(message: Message, state: FSMContext) -> None:
 
 
 @user_fromilize_router.message()
-async def get_all(message: Message, callback_data: UserCallbackData):
+async def get_all(message: Message):
 
     connect_to_db()
 
@@ -273,16 +273,16 @@ async def get_all(message: Message, callback_data: UserCallbackData):
                 fill=(255, 255, 255), outline=(255, 255, 255))
             draw.text((j * cell_size[0] + 50, (i + 1) * cell_size[1] + 50), str(data[i][j]), font=font, fill=(0, 0, 0))
 
-    filename = r"C:\Users\37533\PycharmProjects\parser\parser\logo_new.png"
+    filename = r"C:\Users\user\PycharmProjects\test_bot_official\parser\logo_new.png"
 
     with Image.open(filename) as img:
         img.load()
     im.paste(img, (10, 10), mask=img.convert('RGBA'))
-    im.save(fr"C:\Users\37533\PycharmProjects\parser\photos\{user_name}.png")
+    im.save(fr"C:\Users\user\PycharmProjects\test_bot_official\parser\photos{user_name}.png")
 
     driver.quit()
 
-    filename = fr"C:\Users\37533\PycharmProjects\parser\photos\{user_name}.png"
+    filename = fr"C:\Users\user\PycharmProjects\test_bot_official\parser\photos{user_name}.png"
 
     await message.answer_photo(photo=FSInputFile(filename))
 
