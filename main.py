@@ -1,11 +1,12 @@
-from models import Start
+from models import Start, Category, Brand, Model
 
 
 async def main():
-    N = ['Хочу купить оборудование', 'Хочу обсудить индивидуально', 'У меня есть вопрос', 'Калькулятор доходности']
+    N = ['Да, хочу скидку', 'Нет, откажусь']
     for n in N:
-        n = Start(
+        n = Model(
             name=n,
+            brand_id=1
         )
         await n.save()
 
