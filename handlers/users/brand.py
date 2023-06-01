@@ -35,7 +35,7 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData, st
 
     if callback_data.category_id == 1:
 
-        await state.set_state(Form.cost_electr)
+        await state.set_state(Form.coin)
         await callback.message.answer(
             text='Выберите валюту для рассчета',
             reply_markup=walet_panel

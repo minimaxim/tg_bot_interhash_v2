@@ -40,7 +40,7 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
         )
     elif callback_data.start_id == 4:
 
-        await state.set_state(Form.cost_electr)
+        await state.set_state(Form.coin)
         await callback.message.answer(
             text='Выберите валюту для рассчета',
             reply_markup=walet_panel

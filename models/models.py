@@ -91,6 +91,7 @@ class User(BaseMixin, Base):
     brand_name = Column(VARCHAR(128), nullable=True)
     model_name = Column(VARCHAR(128), nullable=True)
     currency = Column(VARCHAR(5), nullable=True)
+    coin = Column(VARCHAR(24), nullable=True)
     cost_electricity = Column(VARCHAR(128), nullable=True)
     hash = Column(VARCHAR(128), nullable=True)
     potreb = Column(VARCHAR(128), nullable=True)
@@ -102,6 +103,14 @@ class User(BaseMixin, Base):
 
 class Start(BaseMixin, Base):
     __tablename__: str = 'start'
+
+    id = Column(SmallInteger, primary_key=True)
+    name = Column(VARCHAR(128), nullable=False)
+    is_published = Column(Boolean, default=True, nullable=True)
+
+
+class Coin(BaseMixin, Base):
+    __tablename__: str = 'coins'
 
     id = Column(SmallInteger, primary_key=True)
     name = Column(VARCHAR(128), nullable=False)

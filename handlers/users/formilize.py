@@ -2,14 +2,15 @@ import time
 
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, FSInputFile
+from aiogram.types import Message, FSInputFile, CallbackQuery
 
-from keyboards.inline.users import brand_paginator_ikb
+from keyboards.inline.users import coin_ikb
 from keyboards.inline.users.general import UserCallbackData
 from keyboards.reply.users import main_panel
+
 from parser.connection import connect_to_db
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -21,6 +22,7 @@ user_fromilize_router = Router(name='user_formilize')
 class Form(StatesGroup):
     user = State()
     currency = State()
+    coin = State()
     cost_electr = State()
     hash_rate = State()
     potr_electr = State()
@@ -28,8 +30,8 @@ class Form(StatesGroup):
     finish = State()
 
 
-@user_fromilize_router.message(Form.cost_electr)
-async def get_cost(message: Message, state: FSMContext) -> None:
+@user_fromilize_router.message(Form.coin)
+async def get_coin(message: Message, state: FSMContext):
 
     connect_to_db()
 
@@ -49,17 +51,60 @@ async def get_cost(message: Message, state: FSMContext) -> None:
     cur.close()
     conn.close()
 
-    await state.update_data(currency=message.from_user.id)
     await state.update_data(currency=message.text)
-    await state.set_state(Form.hash_rate)
+    await state.set_state(Form.cost_electr)
 
     await message.answer(
+        text='Выберите монету',
+        reply_markup=await coin_ikb()
+    )
+
+
+@user_fromilize_router.callback_query(UserCallbackData.filter((F.target == 'formilize') & (F.action == 'get')))
+async def get_cost(callback: CallbackQuery, state: FSMContext, callback_data: UserCallbackData):
+
+    connect_to_db()
+
+    if callback_data.coin_id == 1:
+        coin = 'bitcoin'
+    elif callback_data.coin_id == 2:
+        coin = 'dogecoin'
+    elif callback_data.coin_id == 3:
+        coin = 'litecoin'
+    elif callback_data.coin_id == 4:
+        coin = 'bitcoin-cash'
+    elif callback_data.coin_id == 5:
+        coin = 'ethereum-classic'
+    elif callback_data.coin_id == 6:
+        coin = 'kadena'
+    elif callback_data.coin_id == 7:
+        coin = 'zcash'
+    elif callback_data.coin_id == 8:
+        coin = 'dash'
+    elif callback_data.coin_id == 9:
+        coin = 'decred'
+
+    user = callback.from_user.id
+
+    conn = connect_to_db()
+    cur = conn.cursor()
+
+    cur.execute("""UPDATE users SET coin = (%s) WHERE id = (%s)""", (coin, user))
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    await state.update_data(coin=callback_data.coin_id)
+    await state.set_state(Form.hash_rate)
+
+    await callback.message.answer(
     text='Укажите цену на электричество (кВт/ч):',
     reply_markup=main_panel
 )
 
 @user_fromilize_router.message(Form.hash_rate)
-async def get_hash(message: Message, state: FSMContext) -> None:
+async def get_hash(message: Message, state: FSMContext):
 
     connect_to_db()
 
@@ -72,19 +117,44 @@ async def get_hash(message: Message, state: FSMContext) -> None:
     cur.execute("""UPDATE users SET cost_electricity = (%s) WHERE id = (%s)""", (cost, user))
     conn.commit()
 
+    cur.execute("""SELECT coin FROM users WHERE id = (%s)""", (user,))
+
+    coin_type = cur.fetchall()[0][0]
+
     cur.close()
     conn.close()
 
     await state.update_data(cost_electr=message.text)
     await state.set_state(Form.potr_electr)
 
-    await message.answer(
-            text='Укажите хешрейт (Th/s):',
+    if coin_type == "bitcoin" or coin_type == "bitcoin-cash" or coin_type == "kadena" or coin_type == "decred":
+
+        await message.answer(
+                text='Укажите хешрейт (Th/s):',
+                reply_markup=main_panel
+            )
+
+    elif coin_type == "dogecoin" or coin_type == "litecoin" or coin_type == "dash":
+        await message.answer(
+            text='Укажите хешрейт (Gh/s):',
             reply_markup=main_panel
         )
 
+    elif coin_type == "ethereum-classic":
+        await message.answer(
+            text='Укажите хешрейт (Mh/s):',
+            reply_markup=main_panel
+        )
+
+    elif coin_type == "zcash":
+        await message.answer(
+            text='Укажите хешрейт (kh/s):',
+            reply_markup=main_panel
+        )
+
+
 @user_fromilize_router.message(Form.potr_electr)
-async def get_potr(message: Message, state: FSMContext) -> None:
+async def get_potr(message: Message, state: FSMContext):
 
     connect_to_db()
 
@@ -109,7 +179,7 @@ async def get_potr(message: Message, state: FSMContext) -> None:
         )
 
 @user_fromilize_router.message(Form.comm_pull)
-async def get_comm(message: Message, state: FSMContext) -> None:
+async def get_comm(message: Message, state: FSMContext):
 
     connect_to_db()
 
@@ -135,7 +205,7 @@ async def get_comm(message: Message, state: FSMContext) -> None:
 
 
 @user_fromilize_router.message(Form.finish)
-async def get_final(message: Message, state: FSMContext) -> None:
+async def get_final(message: Message, state: FSMContext):
 
     connect_to_db()
 
@@ -161,7 +231,7 @@ async def get_final(message: Message, state: FSMContext) -> None:
 
 
 @user_fromilize_router.message()
-async def get_all(message: Message, callback_data: UserCallbackData):
+async def get_all(message: Message,):
 
     connect_to_db()
 
@@ -192,6 +262,10 @@ async def get_all(message: Message, callback_data: UserCallbackData):
     conn.commit()
     komm = cur.fetchall()[0][0]
 
+    cur.execute("""SELECT coin FROM users WHERE id = (%s)""", (user,))
+    conn.commit()
+    coin = cur.fetchall()[0][0]
+
     cur.close()
     conn.close()
 
@@ -200,11 +274,11 @@ async def get_all(message: Message, callback_data: UserCallbackData):
     chrome_options.add_argument("--headless")
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get("https://ultramining.com/crypto-calc/bitcoin/")
+    driver.get(f"https://ultramining.com/crypto-calc/{coin}/")
 
     if currency == 'USA':
         driver.find_element(By.CLASS_NAME, 'input-group-append').click()
-        time.sleep(2)
+        time.sleep(1)
         driver.find_element(By.XPATH, "//*[@id='content']/div[2]/div[2]/div[1]/div/div/div/div[1]").click()
         time.sleep(1)
     else:
@@ -230,7 +304,7 @@ async def get_all(message: Message, callback_data: UserCallbackData):
     price.clear()
     price.send_keys(komm)
 
-    time.sleep(3)
+    time.sleep(1)
 
     rows = driver.find_element(By.CLASS_NAME, 'dataTables_scrollBody')
 
@@ -252,7 +326,7 @@ async def get_all(message: Message, callback_data: UserCallbackData):
     data = df[columns].values.tolist()
 
     font = ImageFont.truetype('arial.ttf', 22)
-    cell_size = (250, 120)
+    cell_size = (270, 130)
 
     num_rows = len(data)
     num_cols = len(columns)
