@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from handlers.users.formilize import Form
-from keyboards.inline.users import category_paginator_ikb
+from keyboards.inline.users import category_paginator_ikb, cur_ikb
 from keyboards.inline.users.general import UserCallbackData
 from keyboards.reply.users.walet import walet_panel
 
@@ -41,9 +41,9 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
     elif callback_data.start_id == 4:
 
         await state.set_state(Form.coin)
-        await callback.message.answer(
+        await callback.message.edit_text(
             text='Выберите валюту для рассчета',
-            reply_markup=walet_panel
+            reply_markup=await cur_ikb()
         )
 
     else:
