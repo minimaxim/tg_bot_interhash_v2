@@ -30,17 +30,17 @@ class Form(StatesGroup):
     finish = State()
 
 
-@user_fromilize_router.message(Form.coin)
-async def get_coin(message: Message, state: FSMContext):
+@user_fromilize_router.callback_query(UserCallbackData.filter((F.target == 'curs') & (F.action == 'get')))
+async def get_coin(callback: CallbackQuery, state: FSMContext, callback_data: UserCallbackData):
 
     connect_to_db()
 
-    if message.text == 'RUS🇷🇺':
+    if callback_data.coin_id == 1:
         val = 'RUS'
     else:
         val = 'USA'
 
-    user = message.from_user.id
+    user = callback.from_user.id
 
     conn = connect_to_db()
     cur = conn.cursor()
@@ -51,16 +51,16 @@ async def get_coin(message: Message, state: FSMContext):
     cur.close()
     conn.close()
 
-    await state.update_data(currency=message.text)
+    await state.update_data(currency=callback_data.currency_id)
     await state.set_state(Form.cost_electr)
 
-    await message.answer(
+    await callback.message.edit_text(
         text='Выберите монету',
         reply_markup=await coin_ikb()
     )
 
 
-@user_fromilize_router.callback_query(UserCallbackData.filter((F.target == 'formilize') & (F.action == 'get')))
+@user_fromilize_router.callback_query(UserCallbackData.filter((F.target == 'coins') & (F.action == 'get')))
 async def get_cost(callback: CallbackQuery, state: FSMContext, callback_data: UserCallbackData):
 
     connect_to_db()
@@ -316,13 +316,15 @@ async def get_all(message: Message,):
     for row in row_name:
         row_text = row.text
         median_text = row_text.split()
+        median_text[2] = str("{0:.10f}".format(float(median_text[2])))
         pre_fi = [median_text[0] + ' ' + median_text[1], median_text[2] + ' ' +
                   median_text[3], median_text[4], median_text[5] + median_text[6], median_text[7]]
         bable.append(pre_fi)
 
-    df = pd.DataFrame(bable, columns=['Период', 'Награда', 'Доход', 'Расходы', 'Прибыль'])
 
-    columns = ['Период', 'Награда', 'Доход', 'Расходы', 'Прибыль']
+    df = pd.DataFrame(bable, columns=['Period', 'Reward', 'Income', 'Expenses', 'Profit'])
+
+    columns = ['Period', 'Reward', 'Income', 'Expenses', 'Profit']
     data = df[columns].values.tolist()
 
     font = ImageFont.truetype('arial.ttf', 22)

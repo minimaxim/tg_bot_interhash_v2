@@ -10,6 +10,7 @@ class UserCallbackData(CallbackData, prefix='user'):
     category_id: int = None
     product_id: int = None
     coin_id: int = None
+    currency_id: int = None
     brand_page: int = 0
     category_page: int = 0
     model_page: int = 0

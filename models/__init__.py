@@ -1,4 +1,4 @@
-from .models import (Base, Category, User, Start, Brand, Model, Coin)
+from .models import (Base, Category, User, Start, Brand, Model, Coin, Currency)
 
 
 __all__: list[str] = [
@@ -8,5 +8,6 @@ __all__: list[str] = [
     'Start',
     'Brand',
     'Model',
-    'Coin'
+    'Coin',
+    'Currency'
 ]

@@ -116,3 +116,11 @@ class Coin(BaseMixin, Base):
     name = Column(VARCHAR(128), nullable=False)
     is_published = Column(Boolean, default=True, nullable=True)
 
+
+class Currency(BaseMixin, Base):
+    __tablename__: str = 'currencies'
+
+    id = Column(SmallInteger, primary_key=True)
+    name = Column(VARCHAR(128), nullable=False)
+    is_published = Column(Boolean, default=True, nullable=True)
+

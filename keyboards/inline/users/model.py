@@ -9,8 +9,7 @@ from .general import UserCallbackData
 async def model_paginator_ikb(callback_data: UserCallbackData) -> InlineKeyboardMarkup:
     models = await Model.all(is_published=True)
     models_iter = iter(models)
-    models = list(zip_longest(*([models_iter] * 5)))
-    models_page = list(filter(lambda x: x, models[callback_data.model_page]))
+    models_iter = map(list, zip_longest(*([models_iter] * 2)))
     buttons = [
         [
             InlineKeyboardButton(
@@ -23,8 +22,10 @@ async def model_paginator_ikb(callback_data: UserCallbackData) -> InlineKeyboard
                     }
                 ).pack()
             )
+            for model in line
+            if model
         ]
-        for model in models_page
+        for line in models_iter
     ]
     buttons += [
         [

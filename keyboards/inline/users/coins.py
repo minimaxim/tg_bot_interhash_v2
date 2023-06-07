@@ -15,7 +15,7 @@ async def coin_ikb() -> InlineKeyboardMarkup:
             InlineKeyboardButton(
                 text=coin.name.upper(),
                 callback_data=UserCallbackData(
-                    target='formilize',
+                    target='coins',
                     action='get',
                     coin_id=coin.id
                 ).pack()

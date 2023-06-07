@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from handlers.users.formilize import Form
-from keyboards.inline.users import brand_paginator_ikb, all_list_ikb
+from keyboards.inline.users import brand_paginator_ikb, all_list_ikb, cur_ikb
 from keyboards.inline.users.general import UserCallbackData
 from keyboards.reply.users import walet_panel
 from parser.connection import connect_to_db
@@ -36,9 +36,9 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData, st
     if callback_data.category_id == 1:
 
         await state.set_state(Form.coin)
-        await callback.message.answer(
+        await callback.message.edit_text(
             text='Выберите валюту для рассчета',
-            reply_markup=walet_panel
+            reply_markup=await cur_ikb()
         )
         
     elif callback_data.category_id == 2:

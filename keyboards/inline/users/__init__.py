@@ -5,6 +5,8 @@ from keyboards.inline.users.brand import brand_paginator_ikb
 from keyboards.inline.users.model import model_paginator_ikb
 from keyboards.inline.users.gpu import all_list_ikb
 from keyboards.inline.users.coins import coin_ikb
+from keyboards.inline.users.currency import cur_ikb
+
 
 __all__: list[str] = [
     'start_ikb',
@@ -12,5 +14,6 @@ __all__: list[str] = [
     'brand_paginator_ikb',
     'model_paginator_ikb',
     'all_list_ikb',
-    'coin_ikb'
+    'coin_ikb',
+    'cur_ikb'
 ]
