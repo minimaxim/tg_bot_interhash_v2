@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
@@ -6,11 +7,9 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, FSInputFile, CallbackQuery
-
 from keyboards.inline.users import coin_ikb
 from keyboards.inline.users.general import UserCallbackData
 from keyboards.reply.users import main_panel
-
 from parser.connection import connect_to_db
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -28,6 +27,7 @@ class Form(StatesGroup):
     potr_electr = State()
     comm_pull = State()
     finish = State()
+    finish2 = State()
 
 
 @user_fromilize_router.callback_query(UserCallbackData.filter((F.target == 'curs') & (F.action == 'get')))
@@ -35,7 +35,7 @@ async def get_coin(callback: CallbackQuery, state: FSMContext, callback_data: Us
 
     connect_to_db()
 
-    if callback_data.coin_id == 1:
+    if callback_data.cur_id == 1:
         val = 'RUS'
     else:
         val = 'USA'
@@ -127,14 +127,14 @@ async def get_hash(message: Message, state: FSMContext):
     await state.update_data(cost_electr=message.text)
     await state.set_state(Form.potr_electr)
 
-    if coin_type == "bitcoin" or coin_type == "bitcoin-cash" or coin_type == "kadena" or coin_type == "decred":
+    if coin_type == "bitcoin" or coin_type == "bitcoin-cash":
 
         await message.answer(
                 text='Укажите хешрейт (Th/s):',
                 reply_markup=main_panel
             )
 
-    elif coin_type == "dogecoin" or coin_type == "litecoin" or coin_type == "dash":
+    elif coin_type == "litecoin" or coin_type == "dash":
         await message.answer(
             text='Укажите хешрейт (Gh/s):',
             reply_markup=main_panel
@@ -220,7 +220,8 @@ async def get_final(message: Message, state: FSMContext):
 
     cur.close()
     conn.close()
-    await state.update_data(potr_electr=message.text)
+    await state.update_data(comm_pull=message.text)
+    await state.set_state(Form.finish2)
 
     await message.answer(
         text='Происходит расчет, пожалуйста, подождите...',
@@ -230,7 +231,7 @@ async def get_final(message: Message, state: FSMContext):
     await get_all(message=message,)
 
 
-@user_fromilize_router.message()
+@user_fromilize_router.message(Form.finish2)
 async def get_all(message: Message,):
 
     connect_to_db()
@@ -349,16 +350,30 @@ async def get_all(message: Message,):
                 fill=(255, 255, 255), outline=(255, 255, 255))
             draw.text((j * cell_size[0] + 50, (i + 1) * cell_size[1] + 50), str(data[i][j]), font=font, fill=(0, 0, 0))
 
-    filename = r"C:\Users\37533\PycharmProjects\parser\parser\logo_new.png"
+    filename = fr"C:\Users\37533\PycharmProjects\parser-v2\logo_new.png"
 
     with Image.open(filename) as img:
         img.load()
     im.paste(img, (10, 10), mask=img.convert('RGBA'))
-    im.save(fr"C:\Users\37533\PycharmProjects\parser\photos\{user_name}.png")
+    im.save(fr"C:\Users\37533\PycharmProjects\parser-v2\photos\{user_name}.png")
 
     driver.quit()
 
-    filename = fr"C:\Users\37533\PycharmProjects\parser\photos\{user_name}.png"
+    filename = fr"C:\Users\37533\PycharmProjects\parser-v2\photos\{user_name}.png"
 
     await message.answer_photo(photo=FSInputFile(filename))
+
+    connect_to_db()
+
+    date = str(datetime.now())
+    user = message.from_user.id
+
+    conn = connect_to_db()
+    cur = conn.cursor()
+
+    cur.execute("""UPDATE users SET date = (%s) WHERE id = (%s)""", (date, user))
+    conn.commit()
+
+    cur.close()
+    conn.close()
 

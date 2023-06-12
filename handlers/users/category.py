@@ -1,12 +1,11 @@
+from datetime import datetime
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
 from handlers.users.formilize import Form
-from keyboards.inline.users import category_paginator_ikb, cur_ikb
+from keyboards.inline.users import category_ikb, cur_ikb, power_ikb
 from keyboards.inline.users.general import UserCallbackData
-from keyboards.reply.users.walet import walet_panel
-
 from parser.connection import connect_to_db
 
 user_category_router = Router(name='user_category')
@@ -34,12 +33,32 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
     conn.close()
 
 
-    if callback_data.start_id == 3:
+    if callback_data.start_id == 2:
         await callback.message.edit_text(
-            text='Спасибо за ответ! К вам подключится специалист... Напишите пожалуйста свой вопрос ☺',
+            text='Укажите Вашу мощность',
+            reply_markup=await power_ikb()
         )
-    elif callback_data.start_id == 4:
 
+    elif callback_data.start_id == 3:
+        await callback.message.edit_text(
+            text='Скоро с Вами свяжется специалист',
+        )
+
+        connect_to_db()
+
+        date = str(datetime.now())
+        user = callback.from_user.id
+
+        conn = connect_to_db()
+        cur = conn.cursor()
+
+        cur.execute("""UPDATE users SET date = (%s) WHERE id = (%s)""", (date, user))
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+    elif callback_data.start_id == 4:
         await state.set_state(Form.coin)
         await callback.message.edit_text(
             text='Выберите валюту для рассчета',
@@ -49,7 +68,5 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
     else:
         await callback.message.edit_text(
             text='Знаете ли вы какое оборудование вам необходимо?',
-            reply_markup=await category_paginator_ikb(callback_data=callback_data)
+            reply_markup=await category_ikb()
         )
-
-

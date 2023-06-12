@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, VARCHAR, select, Boolean, BigInteger, SmallInteger
+from sqlalchemy import Column, Integer, VARCHAR, select, Boolean, BigInteger, SmallInteger, DATETIME
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base
 
@@ -50,7 +50,7 @@ class BaseMixin(object):
 class Category(BaseMixin, Base):
     __tablename__: str = 'categories'
 
-    start_id = Column(SmallInteger, ForeignKey('start.id', ondelete='CASCADE'), nullable=False)
+    id = Column(SmallInteger, primary_key=True)
     name = Column(VARCHAR(64), nullable=False, unique=True)
     is_published = Column(Boolean, default=True)
 
@@ -58,44 +58,28 @@ class Category(BaseMixin, Base):
         return self.name
 
 
-class Brand(BaseMixin, Base):
-    __tablename__: str = 'brands'
-
-    category_id = Column(SmallInteger, ForeignKey('categories.id', ondelete='CASCADE'), nullable=False)
-    name = Column(VARCHAR(64), unique=True, nullable=False)
-    is_published = Column(Boolean, default=True)
-
-
-    def __str__(self):
-        return self.name
-
-
-class Model(BaseMixin, Base):
-    __tablename__: str = 'models'
-
-    brand_id = Column(SmallInteger, ForeignKey('brands.id', ondelete='CASCADE'), nullable=False)
-    name = Column(VARCHAR(64), unique=True, nullable=False)
-    is_published = Column(Boolean, default=True)
-
-    def __str__(self):
-        return self.name
-
 
 class User(BaseMixin, Base):
     __tablename__: str = 'users'
 
     id = Column(BigInteger, primary_key=True)
-    name = Column(VARCHAR(128), nullable=False)
+    name = Column(VARCHAR(128), nullable=True)
+    username = Column(VARCHAR(128), nullable=True)
     start_name = Column(VARCHAR(128), nullable=True)
     category_name = Column(VARCHAR(128), nullable=True)
-    brand_name = Column(VARCHAR(128), nullable=True)
     model_name = Column(VARCHAR(128), nullable=True)
+    kolvo = Column(VARCHAR(128), nullable=True)
+    call_me = Column(VARCHAR(128), nullable=True)
+    discont = Column(VARCHAR(5), nullable=True)
+    power = Column(VARCHAR(128), nullable=True)
     currency = Column(VARCHAR(5), nullable=True)
     coin = Column(VARCHAR(24), nullable=True)
     cost_electricity = Column(VARCHAR(128), nullable=True)
     hash = Column(VARCHAR(128), nullable=True)
     potreb = Column(VARCHAR(128), nullable=True)
     komm = Column(VARCHAR(128), nullable=True)
+    promo = Column(VARCHAR(128), nullable=True)
+    date = Column(VARCHAR(28), nullable=True)
 
     def __str__(self):
         return self.id
@@ -124,3 +108,41 @@ class Currency(BaseMixin, Base):
     name = Column(VARCHAR(128), nullable=False)
     is_published = Column(Boolean, default=True, nullable=True)
 
+
+class Power(BaseMixin, Base):
+    __tablename__: str = 'powers'
+
+    id = Column(SmallInteger, primary_key=True)
+    name = Column(VARCHAR(128), nullable=False)
+    is_published = Column(Boolean, default=True, nullable=True)
+
+
+class Discont(BaseMixin, Base):
+    __tablename__: str = 'disconts'
+
+    id = Column(SmallInteger, primary_key=True)
+    name = Column(VARCHAR(128), nullable=False)
+    is_published = Column(Boolean, default=True, nullable=True)
+
+
+class Promo(BaseMixin, Base):
+    __tablename__: str = 'promocodes'
+
+    id = Column(SmallInteger, primary_key=True)
+    name = Column(VARCHAR(128), nullable=False)
+    is_published = Column(Boolean, default=True, nullable=True)
+
+
+class Application(BaseMixin, Base):
+    __tablename__: str = 'aplications'
+
+    id = Column(SmallInteger, primary_key=True)
+    name = Column(VARCHAR(128), nullable=False)
+    is_published = Column(Boolean, default=True, nullable=True)
+
+
+class Admin(BaseMixin, Base):
+    __tablename__: str ='admin'
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(VARCHAR(32), nullable=False)
