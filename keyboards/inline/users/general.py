@@ -7,7 +7,6 @@ class UserCallbackData(CallbackData, prefix='user'):
     start_id: int = None
     category_id: int = None
     coin_id: int = None
-    cur_id: int = None
     currency_id: int = None
     power_id: int = None
     discont_id: int = None

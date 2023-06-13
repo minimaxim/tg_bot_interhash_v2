@@ -35,10 +35,10 @@ async def get_coin(callback: CallbackQuery, state: FSMContext, callback_data: Us
 
     connect_to_db()
 
-    if callback_data.cur_id == 1:
-        val = 'RUS'
+    if callback_data.currency_id == 1:
+        val = 'RUB ₽'
     else:
-        val = 'USA'
+        val = 'USD $'
 
     user = callback.from_user.id
 
@@ -68,21 +68,16 @@ async def get_cost(callback: CallbackQuery, state: FSMContext, callback_data: Us
     if callback_data.coin_id == 1:
         coin = 'bitcoin'
     elif callback_data.coin_id == 2:
-        coin = 'dogecoin'
+        coin = 'bitcoin-cash'
     elif callback_data.coin_id == 3:
         coin = 'litecoin'
     elif callback_data.coin_id == 4:
-        coin = 'bitcoin-cash'
-    elif callback_data.coin_id == 5:
         coin = 'ethereum-classic'
-    elif callback_data.coin_id == 6:
-        coin = 'kadena'
-    elif callback_data.coin_id == 7:
+    elif callback_data.coin_id == 5:
         coin = 'zcash'
-    elif callback_data.coin_id == 8:
+    elif callback_data.coin_id == 6:
         coin = 'dash'
-    elif callback_data.coin_id == 9:
-        coin = 'decred'
+
 
     user = callback.from_user.id
 
@@ -277,7 +272,7 @@ async def get_all(message: Message,):
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(f"https://ultramining.com/crypto-calc/{coin}/")
 
-    if currency == 'USA':
+    if currency == 'USD $':
         driver.find_element(By.CLASS_NAME, 'input-group-append').click()
         time.sleep(1)
         driver.find_element(By.XPATH, "//*[@id='content']/div[2]/div[2]/div[1]/div/div/div/div[1]").click()

@@ -122,7 +122,7 @@ async def promo(callback: CallbackQuery, callback_data: UserCallbackData) -> Non
 
         date = str(datetime.now())
         user = callback.from_user.id
-        promo = 'yes'
+        promo = 'да'
 
         conn = connect_to_db()
         cur = conn.cursor()
