@@ -13,13 +13,13 @@ from .query import user_admin_router
 user_router = Router(name='users')
 user_router.include_router(router=user_main_router)
 user_router.include_router(router=user_start_router)
+user_router.include_router(router=user_admin_router)
+user_router.include_router(router=user_password_router)
 user_router.include_router(router=user_category_router)
 user_router.include_router(router=user_brand_router)
 user_router.include_router(router=user_fromilize_router)
 user_router.include_router(router=user_viabtc_router)
 user_router.include_router(router=user_power_router)
-user_router.include_router(router=user_admin_router)
-user_router.include_router(router=user_password_router)
 
 
 __all__: list[str] = [

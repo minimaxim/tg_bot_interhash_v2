@@ -202,10 +202,10 @@ async def get_comm(message: Message, state: FSMContext):
 @user_fromilize_router.message(Form.finish)
 async def get_final(message: Message, state: FSMContext):
 
-    connect_to_db()
-
     com = message.text
     user = message.from_user.id
+
+    connect_to_db()
 
     conn = connect_to_db()
     cur = conn.cursor()
@@ -213,23 +213,15 @@ async def get_final(message: Message, state: FSMContext):
     cur.execute("""UPDATE users SET komm = (%s) WHERE id = (%s)""", (com, user))
     conn.commit()
 
-    cur.close()
-    conn.close()
+
     await state.update_data(comm_pull=message.text)
-    await state.set_state(Form.finish2)
+    await state.update_data(finish='done')
 
     await message.answer(
         text='Происходит расчет, пожалуйста, подождите...',
         reply_markup=main_panel
     )
 
-    await get_all(message=message,)
-
-
-@user_fromilize_router.message(Form.finish2)
-async def get_all(message: Message,):
-
-    connect_to_db()
 
     user = message.from_user.id
     user_name = message.from_user.username
@@ -240,7 +232,6 @@ async def get_all(message: Message,):
     cur.execute("""SELECT currency FROM users WHERE id = (%s)""", (user,))
     conn.commit()
     currency = cur.fetchall()[0][0]
-
 
     cur.execute("""SELECT cost_electricity FROM users WHERE id = (%s)""", (user,))
     conn.commit()
@@ -262,12 +253,13 @@ async def get_all(message: Message,):
     conn.commit()
     coin = cur.fetchall()[0][0]
 
-    cur.close()
-    conn.close()
-
-
     chrome_options = Options()
+
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument("disable-infobars")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
 
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(f"https://ultramining.com/crypto-calc/{coin}/")
@@ -317,7 +309,6 @@ async def get_all(message: Message,):
                   median_text[3], median_text[4], median_text[5] + median_text[6], median_text[7]]
         bable.append(pre_fi)
 
-
     df = pd.DataFrame(bable, columns=['Period', 'Reward', 'Income', 'Expenses', 'Profit'])
 
     columns = ['Period', 'Reward', 'Income', 'Expenses', 'Profit']
@@ -358,8 +349,6 @@ async def get_all(message: Message,):
 
     await message.answer_photo(photo=FSInputFile(filename))
 
-    connect_to_db()
-
     date = str(datetime.now())
     user = message.from_user.id
 
@@ -368,6 +357,8 @@ async def get_all(message: Message,):
 
     cur.execute("""UPDATE users SET date = (%s) WHERE id = (%s)""", (date, user))
     conn.commit()
+
+    await state.clear()
 
     cur.close()
     conn.close()
