@@ -27,7 +27,6 @@ class Form(StatesGroup):
     potr_electr = State()
     comm_pull = State()
     finish = State()
-    finish2 = State()
 
 
 @user_fromilize_router.callback_query(UserCallbackData.filter((F.target == 'curs') & (F.action == 'get')))
