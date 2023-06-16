@@ -4,13 +4,14 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
+
 from keyboards.inline.users import promo_ikb, send_promo_ikb
 from keyboards.inline.users.general import UserCallbackData
 from keyboards.reply.users import main_panel
-
 from parser.connection import connect_to_db
 
 user_power_router = Router(name='user_power')
+
 
 class Powerbank(StatesGroup):
     choice = State()
@@ -19,7 +20,6 @@ class Powerbank(StatesGroup):
 
 @user_power_router.callback_query(UserCallbackData.filter((F.target == 'power') & (F.action == 'get')))
 async def power(callback: CallbackQuery, callback_data: UserCallbackData, state: FSMContext):
-
     connect_to_db()
 
     user = callback.from_user.id
@@ -57,7 +57,6 @@ async def power(callback: CallbackQuery, callback_data: UserCallbackData, state:
 
 @user_power_router.message(Powerbank.answer)
 async def answer(message: Message, state: FSMContext):
-
     connect_to_db()
 
     data = message.text
@@ -80,7 +79,7 @@ async def answer(message: Message, state: FSMContext):
 
     await message.answer(
         text='Спасибо, скоро с Вами свяжется менеджер',
-        reply_markup= main_panel
+        reply_markup=main_panel
     )
 
     connect_to_db()
@@ -100,20 +99,16 @@ async def answer(message: Message, state: FSMContext):
 
 @user_power_router.callback_query(UserCallbackData.filter((F.target == 'promo') & (F.action == 'get')))
 async def promo(callback: CallbackQuery, callback_data: UserCallbackData) -> None:
-
     if callback_data.promo_id == 1:
-
         await callback.message.edit_text(
             text='Ваш персональный промокод: 533030',
-            reply_markup= await send_promo_ikb()
+            reply_markup=await send_promo_ikb()
         )
 
 
 @user_power_router.callback_query(UserCallbackData.filter((F.target == 'final') & (F.action == 'get')))
 async def promo(callback: CallbackQuery, callback_data: UserCallbackData) -> None:
-
     if callback_data.app_id == 1:
-
         await callback.message.answer(
             text='Спасибо за заявку, скоро с Вами свяжется менеджер Interhash',
         )

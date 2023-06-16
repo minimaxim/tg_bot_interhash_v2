@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, VARCHAR, select, Boolean, BigInteger, SmallInteger, DATETIME
+from sqlalchemy import Column, Integer, VARCHAR, select, Boolean, BigInteger, SmallInteger
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base
 
@@ -56,7 +56,6 @@ class Category(BaseMixin, Base):
 
     def __str__(self):
         return self.name
-
 
 
 class User(BaseMixin, Base):
@@ -142,7 +141,7 @@ class Application(BaseMixin, Base):
 
 
 class Admin(BaseMixin, Base):
-    __tablename__: str ='admin'
+    __tablename__: str = 'admin'
 
     id = Column(BigInteger, primary_key=True)
     name = Column(VARCHAR(32), nullable=False)

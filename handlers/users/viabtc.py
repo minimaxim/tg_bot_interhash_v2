@@ -4,6 +4,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery
+
 from keyboards.inline.users import discont_ikb
 from keyboards.inline.users.general import UserCallbackData
 from keyboards.reply.users import main_panel
@@ -22,7 +23,6 @@ class Via(StatesGroup):
 
 @user_viabtc_router.message(Via.model)
 async def get_model(message: Message, state: FSMContext):
-
     connect_to_db()
 
     model = message.text
@@ -43,12 +43,11 @@ async def get_model(message: Message, state: FSMContext):
     await message.answer(
         text='Укажите количество',
         reply_markup=main_panel
-        )
+    )
 
 
 @user_viabtc_router.message(Via.kolvo)
 async def get_kolvo(message: Message, state: FSMContext):
-
     connect_to_db()
 
     kolvo = message.text
@@ -69,12 +68,11 @@ async def get_kolvo(message: Message, state: FSMContext):
     await message.answer(
         text='Укажите контакный номер телефона и удобный способ для связи',
         reply_markup=main_panel
-        )
+    )
 
 
 @user_viabtc_router.message(Via.connect)
 async def get_connect(message: Message, state: FSMContext):
-
     connect_to_db()
 
     connect = message.text
@@ -94,13 +92,12 @@ async def get_connect(message: Message, state: FSMContext):
 
     await message.answer(
         text='Необходима скидка на подключение?',
-        reply_markup= await discont_ikb()
+        reply_markup=await discont_ikb()
     )
 
 
 @user_viabtc_router.callback_query(UserCallbackData.filter((F.target == 'discont') & (F.action == 'get')))
 async def get_connect(callback: CallbackQuery, state: FSMContext, callback_data: UserCallbackData):
-
     connect_to_db()
 
     if callback_data.discont_id == 1:
@@ -140,4 +137,3 @@ async def get_connect(callback: CallbackQuery, state: FSMContext, callback_data:
 
     cur.close()
     conn.close()
-
