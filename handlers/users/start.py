@@ -6,7 +6,7 @@ from keyboards.inline.users.general import UserCallbackData
 user_start_router = Router(name='user_start')
 
 
-@user_start_router.message(F.text == 'НАЖМИТЕ СЮДА 🔥')
+@user_start_router.message(F.text == 'МЕНЮ 📱')
 async def start_panel_1(message: Message):
     await message.delete()
     await message.answer(

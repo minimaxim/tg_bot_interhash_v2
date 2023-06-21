@@ -98,6 +98,8 @@ async def answer(message: Message, state: FSMContext):
     cur.close()
     conn.close()
 
+    await state.clear()
+
 
 @user_power_router.callback_query(UserCallbackData.filter((F.target == 'promo') & (F.action == 'get')))
 async def promo(callback: CallbackQuery, callback_data: UserCallbackData) -> None:
