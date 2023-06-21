@@ -499,3 +499,5 @@ async def get_final(message: Message, state: FSMContext):
                 text='Укажите комиссию пула (%) числом:',
                 reply_markup=main_panel
             )
+
+        await state.clear()

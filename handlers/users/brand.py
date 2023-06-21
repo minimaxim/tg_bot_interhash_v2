@@ -1,6 +1,10 @@
+from datetime import datetime
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
+
+from handlers.users.category import Category
 from handlers.users.formilize import Form
 from handlers.users.viabtc import Via
 from keyboards.inline.users import cur_ikb
@@ -42,8 +46,25 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData, st
         
     elif callback_data.category_id == 2:
         await callback.message.edit_text(
-            text='Скоро с Вами свяжется специалист ☺',
+            text='Укажите для вас удобный способ связи',
         )
+
+        connect_to_db()
+
+        date = str(datetime.now())
+        user = callback.from_user.id
+
+        conn = connect_to_db()
+        cur = conn.cursor()
+
+        cur.execute("""UPDATE users SET date = (%s) WHERE id = (%s)""", (date, user))
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        await state.update_data(star=callback_data.start_id)
+        await state.set_state(Category.thanks)
 
     elif callback_data.category_id == 3:
         await state.set_state(Via.model)

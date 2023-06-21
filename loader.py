@@ -17,3 +17,5 @@ DATABASE_URL = f'{os.getenv("DATABASE_USERNAME")}:{os.getenv("DATABASE_PASSWORD"
 
 dp = Dispatcher()
 telegraph = Telegraph(access_token='2edf31540e4feaed6a245aeb2fba5f35806a27b60136f176c65d947379a5')
+
+CHAT_ID = "-1001973728521"

@@ -3,10 +3,7 @@ from datetime import datetime
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, CallbackQuery
-
-from keyboards.inline.users import discont_ikb
-from keyboards.inline.users.general import UserCallbackData
+from aiogram.types import Message
 from keyboards.reply.users import main_panel
 from parser.connection import connect_to_db
 
@@ -18,7 +15,6 @@ class Via(StatesGroup):
     model = State()
     kolvo = State()
     connect = State()
-    discont = State()
 
 
 @user_viabtc_router.message(Via.model)
@@ -66,16 +62,18 @@ async def get_kolvo(message: Message, state: FSMContext):
     await state.set_state(Via.connect)
 
     await message.answer(
-        text='Укажите контакный номер телефона и удобный способ для связи',
+        text='Оставьте удобный для вас способ связи, либо свяжитесь с нашим менеджером: @interhash_manager',
         reply_markup=main_panel
     )
 
 
 @user_viabtc_router.message(Via.connect)
 async def get_connect(message: Message, state: FSMContext):
+
     connect_to_db()
 
     connect = message.text
+
     user = message.from_user.id
 
     conn = connect_to_db()
@@ -87,39 +85,8 @@ async def get_connect(message: Message, state: FSMContext):
     cur.close()
     conn.close()
 
-    await state.update_data(kolvo=message.text)
-    await state.set_state(Via.discont)
-
     await message.answer(
-        text='Необходима скидка на подключение?',
-        reply_markup=await discont_ikb()
-    )
-
-
-@user_viabtc_router.callback_query(UserCallbackData.filter((F.target == 'discont') & (F.action == 'get')))
-async def get_connect(callback: CallbackQuery, state: FSMContext, callback_data: UserCallbackData):
-    connect_to_db()
-
-    if callback_data.discont_id == 1:
-        discont = 'Да'
-    else:
-        discont = 'Нет'
-
-    user = callback.from_user.id
-
-    conn = connect_to_db()
-    cur = conn.cursor()
-
-    cur.execute("""UPDATE users SET discont = (%s) WHERE id = (%s)""", (discont, user))
-    conn.commit()
-
-    cur.close()
-    conn.close()
-
-    await state.update_data(discont=discont)
-
-    await callback.message.answer(
-        text='Спасибо за заявку, скоро с Вами свяжется менеджер Interhash',
+        text='Cпасибо за обращение, наш менеджер свяжется с вами в ближайшее время',
         reply_markup=main_panel
     )
 
@@ -127,7 +94,7 @@ async def get_connect(callback: CallbackQuery, state: FSMContext, callback_data:
 
     date = str(datetime.now())
 
-    user = callback.from_user.id
+    user = message.from_user.id
 
     conn = connect_to_db()
     cur = conn.cursor()
@@ -137,3 +104,5 @@ async def get_connect(callback: CallbackQuery, state: FSMContext, callback_data:
 
     cur.close()
     conn.close()
+
+    await state.clear()

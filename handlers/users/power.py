@@ -20,6 +20,7 @@ class Powerbank(StatesGroup):
 
 @user_power_router.callback_query(UserCallbackData.filter((F.target == 'power') & (F.action == 'get')))
 async def power(callback: CallbackQuery, callback_data: UserCallbackData, state: FSMContext):
+
     connect_to_db()
 
     user = callback.from_user.id
@@ -49,7 +50,7 @@ async def power(callback: CallbackQuery, callback_data: UserCallbackData, state:
 
     elif callback_data.power_id == 2:
         await callback.message.edit_text(
-            text='Вашей мощности достаточно для индивидуальных условий. Пожалуйста, укажите удобный способ для связи',
+            text='Оставьте удобный для вас способ связи, либо свяжитесь с нашим менеджером: @interhash_manager',
         )
 
         await state.set_state(Powerbank.answer)
@@ -57,6 +58,7 @@ async def power(callback: CallbackQuery, callback_data: UserCallbackData, state:
 
 @user_power_router.message(Powerbank.answer)
 async def answer(message: Message, state: FSMContext):
+
     connect_to_db()
 
     data = message.text
@@ -78,7 +80,7 @@ async def answer(message: Message, state: FSMContext):
     await state.update_data(answer=message.text)
 
     await message.answer(
-        text='Спасибо, скоро с Вами свяжется менеджер',
+        text='Спасибо за заявку, скоро с вами свяжется наш менеджер',
         reply_markup=main_panel
     )
 
@@ -99,34 +101,8 @@ async def answer(message: Message, state: FSMContext):
 
 @user_power_router.callback_query(UserCallbackData.filter((F.target == 'promo') & (F.action == 'get')))
 async def promo(callback: CallbackQuery, callback_data: UserCallbackData) -> None:
-    if callback_data.promo_id == 1:
-        await callback.message.edit_text(
-            text='Ваш персональный промокод: 533030',
-            reply_markup=await send_promo_ikb()
-        )
 
-
-@user_power_router.callback_query(UserCallbackData.filter((F.target == 'final') & (F.action == 'get')))
-async def promo(callback: CallbackQuery, callback_data: UserCallbackData) -> None:
-    if callback_data.app_id == 1:
-        await callback.message.answer(
-            text='Спасибо за заявку, скоро с Вами свяжется менеджер Interhash',
-        )
-
-        connect_to_db()
-
-        date = str(datetime.now())
-        user = callback.from_user.id
-        promo = 'да'
-
-        conn = connect_to_db()
-        cur = conn.cursor()
-
-        cur.execute("""UPDATE users SET promo = (%s) WHERE id = (%s)""", (promo, user))
-        conn.commit()
-
-        cur.execute("""UPDATE users SET date = (%s) WHERE id = (%s)""", (date, user))
-        conn.commit()
-
-        cur.close()
-        conn.close()
+    await callback.message.edit_text(
+        text='Ваш персональный промокод: 533030',
+        reply_markup=await send_promo_ikb()
+    )

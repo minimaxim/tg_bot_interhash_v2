@@ -1,28 +1,20 @@
 from itertools import zip_longest
 
+from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from models.models import Application
 from .general import UserCallbackData
 
 
 async def send_promo_ikb() -> InlineKeyboardMarkup:
-    apps = await Application.all(is_published=True)
-    apps_iter = iter(apps)
-    apps_iter = map(list, zip_longest(*([apps_iter] * 2)))
-    buttons = [
+    button = [
         [
             InlineKeyboardButton(
-                text=app.name.upper(),
-                callback_data=UserCallbackData(
-                    target='final',
-                    action='get',
-                    app_id=app.id
-                ).pack()
-            )
-            for app in line
-            if app
+                text="Зарегистрироваться",
+                url="https://www.viabtc.net/signup?refer=533030"
+                )
         ]
-        for line in apps_iter
     ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
+    return InlineKeyboardMarkup(row_width=1, inline_keyboard=button)

@@ -69,7 +69,6 @@ class User(BaseMixin, Base):
     model_name = Column(VARCHAR(128), nullable=True)
     kolvo = Column(VARCHAR(128), nullable=True)
     call_me = Column(VARCHAR(128), nullable=True)
-    discont = Column(VARCHAR(5), nullable=True)
     power = Column(VARCHAR(128), nullable=True)
     currency = Column(VARCHAR(5), nullable=True)
     coin = Column(VARCHAR(24), nullable=True)
