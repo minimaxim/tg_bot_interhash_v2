@@ -19,8 +19,6 @@ def math(user_name, currency, cost_electricity, hash, potreb, komm, coin):
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(f"https://ultramining.com/crypto-calc/{coin}/")
 
-
-
     if currency == 'USD $':
         driver.find_element(By.CLASS_NAME, 'input-group-append').click()
         time.sleep(1)
