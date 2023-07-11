@@ -79,16 +79,26 @@ async def get_cost(callback: CallbackQuery, state: FSMContext, callback_data: Us
     cur.execute("""UPDATE users SET coin = (%s) WHERE id = (%s)""", (coin, user))
     conn.commit()
 
-    cur.close()
-    conn.close()
-
     await state.update_data(coin=callback_data.coin_id)
     await state.set_state(Form.hash_rate)
 
-    await callback.message.answer(
-        text='Укажите цену на электричество (кВт/ч):',
-        reply_markup=main_panel
-    )
+    cur.execute("""SELECT currency from users WHERE id = (%s)""", (user,))
+    val = cur.fetchall()[0][0]
+    conn.commit()
+
+    if val == 'RUB ₽':
+        await callback.message.answer(
+            text='Укажите цену на электричество (кВт/ч) в рублях:',
+            reply_markup=main_panel
+        )
+    else:
+        await callback.message.answer(
+            text='Укажите цену на электричество (кВт/ч) в долларах:',
+            reply_markup=main_panel
+        )
+
+    cur.close()
+    conn.close()
 
 
 @user_fromilize_router.message(Form.hash_rate)
@@ -101,7 +111,7 @@ async def get_hash(message: Message, state: FSMContext):
 
         if message.text < '0':
             await message.answer(
-                text='Укажите цену на электричество (кВт/ч) больше 0.1:',
+                text='Минимальная цена на электричество (кВт/ч) 0.01:',
                 reply_markup=main_panel
             )
         else:
@@ -126,7 +136,6 @@ async def get_hash(message: Message, state: FSMContext):
             await state.set_state(Form.potr_electr)
 
             if coin_type == "bitcoin" or coin_type == "bitcoin-cash":
-
                 await message.answer(
                     text='Укажите хешрейт (Th/s):',
                     reply_markup=main_panel
@@ -153,9 +162,9 @@ async def get_hash(message: Message, state: FSMContext):
         try:
             float(tip)
 
-            if message.text < '0.1':
+            if message.text < '0.01':
                 await message.answer(
-                    text='Укажите цену на электричество (кВт/ч) больше 0.1:',
+                    text='Минимальная цена на электричество (кВт/ч) 0.01:',
                     reply_markup=main_panel
                 )
             else:
@@ -170,7 +179,6 @@ async def get_hash(message: Message, state: FSMContext):
                 conn.commit()
 
                 cur.execute("""SELECT coin FROM users WHERE id = (%s)""", (user,))
-
                 coin_type = cur.fetchall()[0][0]
 
                 cur.close()
@@ -220,7 +228,7 @@ async def get_potr(message: Message, state: FSMContext):
     if tip.isdecimal():
         if message.text < '0':
             await message.answer(
-                text='Укажите хешрейт больше 0.1:',
+                text='Укажите хешрейт больше 0.09:',
                 reply_markup=main_panel
             )
         else:
@@ -250,7 +258,7 @@ async def get_potr(message: Message, state: FSMContext):
 
             if message.text < '0.1':
                 await message.answer(
-                    text='Укажите хешрейт больше 0.1:',
+                    text='Укажите хешрейт больше 0.09:',
                     reply_markup=main_panel
                 )
 
@@ -292,7 +300,7 @@ async def get_comm(message: Message, state: FSMContext):
     if tip.isdecimal():
         if message.text < '0':
             await message.answer(
-                text='Укажите потребление (Ватт) больше 0.1:',
+                text='Укажите потребление (Ватт) больше 0.09:',
                 reply_markup=main_panel
             )
         else:
@@ -321,7 +329,7 @@ async def get_comm(message: Message, state: FSMContext):
 
             if message.text < '0.1':
                 await message.answer(
-                    text='Укажите потребление (Ватт) больше 0.1:',
+                    text='Укажите потребление (Ватт) больше 0.09:',
                     reply_markup=main_panel
                 )
             else:
@@ -367,11 +375,6 @@ async def get_final(message: Message, state: FSMContext):
             await state.update_data(comm_pull=message.text)
             await state.update_data(finish='done')
 
-            await message.answer(
-                text='Происходит расчет, пожалуйста, подождите...',
-                reply_markup=main_panel
-            )
-
             com = message.text
             user = message.from_user.id
 
@@ -384,7 +387,6 @@ async def get_final(message: Message, state: FSMContext):
             conn.commit()
 
             user = message.from_user.id
-            user_name = message.from_user.username
 
             cur.execute("""SELECT currency FROM users WHERE id = (%s)""", (user,))
             conn.commit()
@@ -408,10 +410,63 @@ async def get_final(message: Message, state: FSMContext):
 
             cur.execute("""SELECT coin FROM users WHERE id = (%s)""", (user,))
             conn.commit()
-            coin = cur.fetchall()[0][0]
+            coin_type = (cur.fetchall()[0][0]).capitalize()
 
-            await message.answer_photo(photo=FSInputFile(math(user_name, currency, cost_electricity, hash, potreb,
-                                                              komm, coin)))
+            result = math(currency, coin_type, cost_electricity, hash, potreb, komm)
+
+            if coin_type == "Bitcoin":
+                coin = 'BTC'
+                hashrate = 'Th/s'
+
+            elif coin_type == "Litecoin":
+                coin = 'LTC'
+                hashrate = 'Gh/s'
+
+            elif coin_type == "Ethereum-classic":
+                coin = 'ETC'
+                hashrate = 'Mh/s'
+
+            elif coin_type == "Zcash":
+                coin = 'ZEC'
+                hashrate = 'kh/s'
+
+            elif coin_type == "Bitcoin-cash":
+                coin = 'BCH'
+                hashrate = 'Th/s'
+
+            else:
+                coin = 'DASH'
+                hashrate = 'Gh/s'
+
+            await message.answer(
+                text=f"Монета: {coin_type}"
+                     f"\nВалюта: {'Российский рубль' if currency == 'RUB ₽' else 'Доллар США'}"
+                     f"\nЦена на электроэнергию: {cost_electricity}"
+                     f"\nВаш хешрейт: {hash} {hashrate} "
+                     f"\nПотребление электроэнергии: {potreb} Ватт"
+                     f"\nКомиссия пула: {komm} %"
+                     "\n\n💵 ПРИБЫЛЬ"
+                     f"\n{result[-4]} {'₽' if currency == 'RUB ₽' else '$'} (в час)"
+                     f"\n{result[-3]} {'₽' if currency == 'RUB ₽' else '$'} (в день)"
+                     f"\n{result[-2]} {'₽' if currency == 'RUB ₽' else '$'} (в неделю)"
+                     f"\n{result[-1]} {'₽' if currency == 'RUB ₽' else '$'} (в месяц)"
+                     "\n\n🥇 НАГРАДА"
+                     f"\n{result[0]} {coin} (в час)"
+                     f"\n{result[1]} {coin} (в день)"
+                     f"\n{result[2]} {coin} (в неделю)"
+                     f"\n{result[3]} {coin} (в месяц)"
+                     "\n\n➕ ДОХОД"
+                     f"\n{result[4]} {'₽' if currency == 'RUB ₽' else '$'} (в час)"
+                     f"\n{result[5]} {'₽' if currency == 'RUB ₽' else '$'} (в день)"
+                     f"\n{result[6]} {'₽' if currency == 'RUB ₽' else '$'} (в неделю)"
+                     f"\n{result[7]} {'₽' if currency == 'RUB ₽' else '$'} (в месяц)"
+                     "\n\n➖ РАСХОДЫ"
+                     f"\n{result[8]} {'₽' if currency == 'RUB ₽' else '$'} (в час)"
+                     f"\n{result[9]} {'₽' if currency == 'RUB ₽' else '$'} (в день)"
+                     f"\n{result[10]} {'₽' if currency == 'RUB ₽' else '$'} (в неделю)"
+                     f"\n{result[11]} {'₽' if currency == 'RUB ₽' else '$'} (в месяц)",
+                reply_markup=main_panel
+            )
 
             date = str(datetime.now())
             user = message.from_user.id

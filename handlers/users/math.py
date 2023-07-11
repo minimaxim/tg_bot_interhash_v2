@@ -1,105 +1,152 @@
-import time
+import requests
 
-import pandas as pd
-from PIL import Image, ImageDraw, ImageFont
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+from parser.exchange import curs
+
+def math(currency, coin_type, cost_electricity, hash, potreb, komm):
+
+    if coin_type == "Bitcoin":
+        url = 'https://whattomine.com/coins/1.json'
+        response = requests.get(url)
+        json_data = response.json()
+        block_reward24 = json_data['block_reward24']
+        difficulty = json_data['difficulty']
+        exchange_rate_json = json_data['exchange_rate']
+        rate = 1e12
 
 
-def math(user_name, currency, cost_electricity, hash, potreb, komm, coin):
-    chrome_options = Options()
+    elif coin_type == "Litecoin":
+        url = 'https://whattomine.com/coins/4.json'
+        response = requests.get(url)
+        json_data = response.json()
+        block_reward24 = json_data['block_reward24']
+        difficulty = json_data['difficulty']
+        exchange_rate_json = json_data['exchange_rate_vol'] / 2.538
+        rate = 1e9
 
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("disable-infobars")
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--no-sandbox")
 
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.get(f"https://ultramining.com/crypto-calc/{coin}/")
+    elif coin_type == "Ethereum-classic":
+        url = 'https://whattomine.com/coins/162.json'
+        response = requests.get(url)
+        json_data = response.json()
+        block_reward24 = json_data['block_reward']
+        difficulty = json_data['difficulty']
+        exchange_rate_json = json_data['exchange_rate_vol']
+        rate = 1e6
 
-    if currency == 'USD $':
-        driver.find_element(By.CLASS_NAME, 'input-group-append').click()
-        time.sleep(1)
-        driver.find_element(By.XPATH, "//*[@id='content']/div[2]/div[2]/div[1]/div/div/div/div[1]").click()
-        time.sleep(1)
+
+    elif coin_type == "Zcash":
+        url = 'https://whattomine.com/coins/166.json'
+        response = requests.get(url)
+        json_data = response.json()
+        block_reward24 = json_data['block_reward24']
+        difficulty = json_data['difficulty']
+        exchange_rate_json = json_data['exchange_rate_vol'] * 2.99
+        rate = 1e3
+
+
+    elif coin_type == "Bitcoin-cash":
+        url = 'https://whattomine.com/coins/193.json'
+        response = requests.get(url)
+        json_data = response.json()
+        block_reward24 = json_data['block_reward24']
+        difficulty = json_data['difficulty']
+        exchange_rate_json = json_data['exchange_rate_vol'] * 2
+        rate = 1e12
+
+
     else:
-        pass
+        url = 'https://whattomine.com/coins/34.json'
+        response = requests.get(url)
+        json_data = response.json()
+        block_reward24 = json_data['block_reward24']
+        difficulty = json_data['difficulty']
+        exchange_rate_json = json_data['exchange_rate_vol'] / 7
+        rate = 1e9
 
-    price = driver.find_element(By.XPATH, "//*[@id='input-electricity']", )
-    price.clear()
-    price.send_keys(cost_electricity)
+    currency_now = curs()
 
-    price = driver.find_element(By.XPATH, "//*[@id='input-electricity']", )
-    price.clear()
-    price.send_keys(cost_electricity)
+    if currency == "RUB ₽":
+        exchange_rate = currency_now * float(exchange_rate_json)
 
-    price = driver.find_element(By.XPATH, "//*[@id='input-hashrate']")
-    price.clear()
-    price.send_keys(hash)
+    else:
+        exchange_rate = float(exchange_rate_json)
 
-    price = driver.find_element(By.XPATH, "//*[@id='input-consumption']")
-    price.clear()
-    price.send_keys(potreb)
+    hour = 3600
+    day = 3600 * 24
+    week = 3600 * 24 * 7
+    month = 3600 * 24 * 30
 
-    price = driver.find_element(By.XPATH, "//*[@id='input-commission']")
-    price.clear()
-    price.send_keys(komm)
+    D = difficulty
+    H = rate * float(hash)
+    R = block_reward24
 
-    time.sleep(1)
+    if coin_type == "Bitcoin":
+        profit_coin = lambda time: (time * R * H) / (D * pow(2, 32))
+        income = lambda incoin: exchange_rate * float(incoin)
+        expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
+                                                                                             ((float(komm) / 100)))
+        profit = lambda inc, expen: inc - expen
+    elif coin_type == "Ethereum-classic":
+        profit_coin = lambda time: (time * R * H) / D
+        income = lambda incoin: exchange_rate * float(incoin) * 0.93
+        expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
+                                                                                             ((float(komm) / 100)))
+        profit = lambda inc, expen: inc - expen
+    elif coin_type == "Zcash":
+        profit_coin = lambda time: (time * R * H) / (D * pow(2, 12.9))
+        income = lambda incoin: exchange_rate * float(incoin)
+        expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
+                                                                                             ((float(komm) / 100)))
+        profit = lambda inc, expen: inc - expen
 
-    rows = driver.find_element(By.CLASS_NAME, 'dataTables_scrollBody')
+    elif coin_type == "Bitcoin-cash":
+        profit_coin = lambda time: (time * R * H) / (D * pow(2, 32))
+        income = lambda incoin: exchange_rate * float(incoin) * 0.55
+        expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
+                                                                                             ((float(komm) / 100))) * 0.8
+        profit = lambda inc, expen: inc - expen
 
-    row_body = rows.find_element(By.TAG_NAME, 'tbody')
-    row_name = row_body.find_elements(By.TAG_NAME, 'tr')
+    elif coin_type == "Litecoin":
+        profit_coin = lambda time: (time * R * H) / (D * pow(2, 32))
+        income = lambda incoin: exchange_rate * float(incoin) * 1.1
+        expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
+                                                                                             ((float(komm) / 100))) * 0.8
+        profit = lambda inc, expen: (inc - expen) * 1.27
 
-    bable = []
+    else:
+        profit_coin = lambda time: (time * R * H) / (D * pow(2, 32))
+        income = lambda incoin: exchange_rate * float(incoin) * 1.19
+        expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
+                                                                                             ((float(komm) / 100)))
+        profit = lambda inc, expen: inc - expen
 
-    for row in row_name:
-        row_text = row.text
-        median_text = row_text.split()
-        median_text[2] = str("{0:.10f}".format(float(median_text[2])))
-        pre_fi = [median_text[0] + ' ' + median_text[1], median_text[2] + ' ' +
-                  median_text[3], median_text[4], median_text[5] + median_text[6], median_text[7]]
-        bable.append(pre_fi)
 
-    df = pd.DataFrame(bable, columns=['Period', 'Reward', 'Income', 'Expenses', 'Profit'])
 
-    columns = ['Period', 'Reward', 'Income', 'Expenses', 'Profit']
-    data = df[columns].values.tolist()
 
-    font = ImageFont.truetype('arial.ttf', 22)
-    cell_size = (270, 130)
 
-    num_rows = len(data)
-    num_cols = len(columns)
-    table_size = (num_cols * cell_size[0], (num_rows + 1) * cell_size[1])
+    profit_coin_hour = profit_coin(hour)
+    profit_coin_day = profit_coin(day)
+    profit_coin_week = profit_coin(week)
+    profit_coin_month = profit_coin(month)
 
-    im = Image.new('RGB', table_size, (255, 255, 255))
-    draw = ImageDraw.Draw(im)
+    income_hour = income(profit_coin_hour)
+    income_day = income(profit_coin_day)
+    income_week = income(profit_coin_week)
+    income_month = income(profit_coin_month)
 
-    for i, col in enumerate(columns):
-        draw.rectangle((i * cell_size[0] + 100, 100, (i + 1) * cell_size[0] + 100, cell_size[1] + 100),
-                       fill=(255, 255, 255), outline=(255, 255, 255))
-        draw.text((i * cell_size[0] + 48, 90), col, font=font, fill=(0, 0, 0))
+    expense_hour = expense(1, income_hour)
+    expense_day = expense(24, income_day)
+    expense_week = expense(168, income_week)
+    expense_month = expense(720, income_month)
 
-    for i in range(num_rows):
-        for j in range(num_cols):
-            draw.rectangle(
-                ((j * cell_size[0], (i + 1) * cell_size[1]), ((j + 1) * cell_size[0], (i + 2) * cell_size[1])),
-                fill=(255, 255, 255), outline=(255, 255, 255))
-            draw.text((j * cell_size[0] + 50, (i + 1) * cell_size[1] + 50), str(data[i][j]), font=font, fill=(0, 0, 0))
+    profit_hour = profit(income_hour, expense_hour)
+    profit_day = profit(income_day, expense_day)
+    profit_week = profit(income_week, expense_week)
+    profit_month = profit(income_month, expense_month)
 
-    filename = fr"C:\Users\37533\PycharmProjects\parser-v2\logo_new.png"
-
-    with Image.open(filename) as img:
-        img.load()
-    im.paste(img, (10, 10), mask=img.convert('RGBA'))
-    im.save(fr"C:\Users\37533\PycharmProjects\parser-v2\photos\{user_name}.png")
-
-    driver.quit()
-
-    filename = fr"C:\Users\37533\PycharmProjects\parser-v2\photos\{user_name}.png"
-
-    return filename
+    return "{0:.10f}".format(profit_coin_hour), "{0:.10f}".format(profit_coin_day),\
+           "{0:.10f}".format(profit_coin_week), "{0:.10f}".format(profit_coin_month), \
+           "{0:.2f}".format(income_hour), "{0:.2f}".format(income_day), "{0:.2f}".format(income_week),\
+           "{0:.2f}".format(income_month), "{0:.2f}".format(expense_hour), "{0:.2f}".format(expense_day),\
+           "{0:.2f}".format(expense_week), "{0:.2f}".format(expense_month), "{0:.2f}".format(profit_hour),\
+           "{0:.2f}".format(profit_day), "{0:.2f}".format(profit_week), "{0:.2f}".format(profit_month)
