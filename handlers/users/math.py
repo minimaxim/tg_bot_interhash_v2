@@ -2,8 +2,8 @@ import requests
 
 from parser.exchange import curs
 
-def math(currency, coin_type, cost_electricity, hash, potreb, komm):
 
+def math(currency, coin_type, cost_electricity, hash, potreb, komm):
     if coin_type == "Bitcoin":
         url = 'https://whattomine.com/coins/1.json'
         response = requests.get(url)
@@ -103,14 +103,18 @@ def math(currency, coin_type, cost_electricity, hash, potreb, komm):
         profit_coin = lambda time: (time * R * H) / (D * pow(2, 32))
         income = lambda incoin: exchange_rate * float(incoin) * 0.55
         expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
-                                                                                             ((float(komm) / 100))) * 0.8
+                                                                                             (
+                                                                                                 (float(
+                                                                                                     komm) / 100))) * 0.8
         profit = lambda inc, expen: inc - expen
 
     elif coin_type == "Litecoin":
         profit_coin = lambda time: (time * R * H) / (D * pow(2, 32))
         income = lambda incoin: exchange_rate * float(incoin) * 1.1
         expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
-                                                                                             ((float(komm) / 100))) * 0.8
+                                                                                             (
+                                                                                                 (float(
+                                                                                                     komm) / 100))) * 0.8
         profit = lambda inc, expen: (inc - expen) * 1.27
 
     else:
@@ -119,10 +123,6 @@ def math(currency, coin_type, cost_electricity, hash, potreb, komm):
         expense = lambda time, exp: float(potreb) / 1000 * time * float(cost_electricity) + (float(exp) *
                                                                                              ((float(komm) / 100)))
         profit = lambda inc, expen: inc - expen
-
-
-
-
 
     profit_coin_hour = profit_coin(hour)
     profit_coin_day = profit_coin(day)
@@ -144,9 +144,9 @@ def math(currency, coin_type, cost_electricity, hash, potreb, komm):
     profit_week = profit(income_week, expense_week)
     profit_month = profit(income_month, expense_month)
 
-    return "{0:.10f}".format(profit_coin_hour), "{0:.10f}".format(profit_coin_day),\
+    return "{0:.10f}".format(profit_coin_hour), "{0:.10f}".format(profit_coin_day), \
            "{0:.10f}".format(profit_coin_week), "{0:.10f}".format(profit_coin_month), \
-           "{0:.2f}".format(income_hour), "{0:.2f}".format(income_day), "{0:.2f}".format(income_week),\
-           "{0:.2f}".format(income_month), "{0:.2f}".format(expense_hour), "{0:.2f}".format(expense_day),\
-           "{0:.2f}".format(expense_week), "{0:.2f}".format(expense_month), "{0:.2f}".format(profit_hour),\
+           "{0:.2f}".format(income_hour), "{0:.2f}".format(income_day), "{0:.2f}".format(income_week), \
+           "{0:.2f}".format(income_month), "{0:.2f}".format(expense_hour), "{0:.2f}".format(expense_day), \
+           "{0:.2f}".format(expense_week), "{0:.2f}".format(expense_month), "{0:.2f}".format(profit_hour), \
            "{0:.2f}".format(profit_day), "{0:.2f}".format(profit_week), "{0:.2f}".format(profit_month)
