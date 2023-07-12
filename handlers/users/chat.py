@@ -12,7 +12,6 @@ async def forward(message: Message):
     await message.forward(chat_id=CHAT_ID)
 
 
-
 @user_chat_router.message(F.chat.type == ChatType.SUPERGROUP, F.reply_to_message)
 async def answer(message: Message):
     await bot.send_message(

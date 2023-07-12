@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from aiogram import Router, F
+from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
+
 from keyboards.reply.users import main_panel
 from parser.connection import connect_to_db
 
@@ -69,7 +70,6 @@ async def get_kolvo(message: Message, state: FSMContext):
 
 @user_viabtc_router.message(Via.connect)
 async def get_connect(message: Message, state: FSMContext):
-
     connect_to_db()
 
     connect = message.text

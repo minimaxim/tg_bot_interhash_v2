@@ -68,7 +68,7 @@ async def get_cost(callback: CallbackQuery, state: FSMContext, callback_data: Us
         coin = 'ethereum-classic'
     elif callback_data.coin_id == 5:
         coin = 'zcash'
-    elif callback_data.coin_id == 6:
+    else:
         coin = 'dash'
 
     user = callback.from_user.id

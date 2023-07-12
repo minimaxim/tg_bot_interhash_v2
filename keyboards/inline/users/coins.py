@@ -9,7 +9,7 @@ from models import Coin
 async def coin_ikb() -> InlineKeyboardMarkup:
     coins = await Coin.all(is_published=True)
     coins_iter = iter(coins)
-    coins_iter = map(list, zip_longest(*([coins_iter]*2)))
+    coins_iter = map(list, zip_longest(*([coins_iter] * 2)))
     buttons = [
         [
             InlineKeyboardButton(

@@ -17,7 +17,6 @@ user_brand_router = Router(name='user_brand')
 
 @user_brand_router.callback_query(UserCallbackData.filter((F.target == 'brand') & (F.action == 'get')))
 async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData, state: FSMContext) -> None:
-
     connect_to_db()
 
     user = callback.from_user.id
@@ -43,7 +42,7 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData, st
             text='Выберите валюту для рассчета',
             reply_markup=await cur_ikb()
         )
-        
+
     elif callback_data.category_id == 2:
         await callback.message.edit_text(
             text='Укажите для вас удобный способ связи',
@@ -72,5 +71,3 @@ async def get_brand(callback: CallbackQuery, callback_data: UserCallbackData, st
             text='Укажите модель',
             reply_markup=main_panel
         )
-
-

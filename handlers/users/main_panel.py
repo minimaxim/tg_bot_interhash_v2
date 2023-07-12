@@ -1,5 +1,6 @@
 from aiogram import F, Router
 from aiogram.types import Message, FSInputFile
+
 from keyboards.reply.users import main_panel
 from models import User
 
@@ -24,7 +25,8 @@ async def command_start(message: Message):
         )
 
     else:
-        user = User(id=message.from_user.id, name=message.from_user.full_name, username=f'@{message.from_user.username}')
+        user = User(id=message.from_user.id, name=message.from_user.full_name,
+                    username=f'@{message.from_user.username}')
         await user.save()
 
         filename = fr"C:\Users\37533\PycharmProjects\parser-v2\photos\start_im.jpg"
@@ -33,9 +35,8 @@ async def command_start(message: Message):
             photo=FSInputFile(filename),
             caption='👋 Привет, '
 
-                 'Мы компания Interhash, Занимаемся предоставлением комплексных услуг для майнинга. '
-                 'Мы на рынке с 2017 года и являемся официальным представителями майнинг-пула ViaBTC'
-                 ' в Европе и странах СНГ.',
+                    'Мы компания Interhash, Занимаемся предоставлением комплексных услуг для майнинга. '
+                    'Мы на рынке с 2017 года и являемся официальным представителями майнинг-пула ViaBTC'
+                    ' в Европе и странах СНГ.',
             reply_markup=main_panel
         )
-

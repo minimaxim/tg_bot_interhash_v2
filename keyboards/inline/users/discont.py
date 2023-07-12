@@ -1,5 +1,7 @@
 from itertools import zip_longest
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from models.models import Discont
 from .general import UserCallbackData
 

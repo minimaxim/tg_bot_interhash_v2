@@ -1,6 +1,6 @@
+import requests
 from bs4 import BeautifulSoup
 
-import requests
 
 def curs():
     url = 'https://ru.investing.com/currencies/usd-rub'

@@ -9,7 +9,7 @@ from .general import UserCallbackData
 async def start_ikb() -> InlineKeyboardMarkup:
     starts = await Start.all(is_published=True)
     starts_iter = iter(starts)
-    starts_iter = map(list, zip_longest(*([starts_iter]*1)))
+    starts_iter = map(list, zip_longest(*([starts_iter] * 1)))
     buttons = [
         [
             InlineKeyboardButton(

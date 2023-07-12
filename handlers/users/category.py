@@ -4,6 +4,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
+
 from handlers.users.formilize import Form
 from keyboards.inline.users import category_ikb, cur_ikb, power_ikb
 from keyboards.inline.users.general import UserCallbackData
@@ -17,9 +18,9 @@ class Category(StatesGroup):
     star = State()
     thanks = State()
 
+
 @user_category_router.callback_query(UserCallbackData.filter((F.target == 'category') & (F.action == 'get')))
 async def paginate_categories(callback: CallbackQuery, callback_data: UserCallbackData, state: FSMContext) -> None:
-
     connect_to_db()
 
     user = callback.from_user.id
@@ -37,7 +38,6 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
 
     cur.close()
     conn.close()
-
 
     if callback_data.start_id == 2:
         await callback.message.edit_text(
@@ -84,7 +84,6 @@ async def paginate_categories(callback: CallbackQuery, callback_data: UserCallba
 
 @user_category_router.message(Category.thanks)
 async def get_contact(message: Message, state: FSMContext):
-
     connect_to_db()
 
     connect = message.text

@@ -1,12 +1,8 @@
-import json
-import psycopg2
-
 from aiogram import F, Router
 from aiogram.types import Message
-from aiohttp import connector
 
-from models import Admin, User
-from keyboards.reply.users import admin, main_panel, pass_panel
+from keyboards.reply.users import admin, pass_panel
+from models import Admin
 
 user_password_router = Router(name='user_password_router')
 

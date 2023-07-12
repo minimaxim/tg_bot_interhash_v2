@@ -1,7 +1,10 @@
 from itertools import zip_longest
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from models.models import Power
 from .general import UserCallbackData
+
 
 async def power_ikb() -> InlineKeyboardMarkup:
     powers = await Power.all(is_published=True)
