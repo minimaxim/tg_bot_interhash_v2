@@ -492,11 +492,6 @@ async def get_final(message: Message, state: FSMContext):
                 await state.update_data(comm_pull=message.text)
                 await state.update_data(finish='done')
 
-                await message.answer(
-                    text='Происходит расчет, пожалуйста, подождите...',
-                    reply_markup=main_panel
-                )
-
                 com = message.text
                 user = message.from_user.id
 
@@ -509,7 +504,6 @@ async def get_final(message: Message, state: FSMContext):
                 conn.commit()
 
                 user = message.from_user.id
-                user_name = message.from_user.username
 
                 cur.execute("""SELECT currency FROM users WHERE id = (%s)""", (user,))
                 conn.commit()
@@ -533,10 +527,63 @@ async def get_final(message: Message, state: FSMContext):
 
                 cur.execute("""SELECT coin FROM users WHERE id = (%s)""", (user,))
                 conn.commit()
-                coin = cur.fetchall()[0][0]
+                coin_type = (cur.fetchall()[0][0]).capitalize()
 
-                await message.answer_photo(photo=FSInputFile(math(user_name, currency, cost_electricity, hash, potreb,
-                                                                  komm, coin)))
+                result = math(currency, coin_type, cost_electricity, hash, potreb, komm)
+
+                if coin_type == "Bitcoin":
+                    coin = 'BTC'
+                    hashrate = 'Th/s'
+
+                elif coin_type == "Litecoin":
+                    coin = 'LTC'
+                    hashrate = 'Gh/s'
+
+                elif coin_type == "Ethereum-classic":
+                    coin = 'ETC'
+                    hashrate = 'Mh/s'
+
+                elif coin_type == "Zcash":
+                    coin = 'ZEC'
+                    hashrate = 'kh/s'
+
+                elif coin_type == "Bitcoin-cash":
+                    coin = 'BCH'
+                    hashrate = 'Th/s'
+
+                else:
+                    coin = 'DASH'
+                    hashrate = 'Gh/s'
+
+                await message.answer(
+                    text=f"Монета: {coin_type}"
+                         f"\nВалюта: {'Российский рубль' if currency == 'RUB ₽' else 'Доллар США'}"
+                         f"\nЦена на электроэнергию: {cost_electricity}"
+                         f"\nВаш хешрейт: {hash} {hashrate} "
+                         f"\nПотребление электроэнергии: {potreb} Ватт"
+                         f"\nКомиссия пула: {komm} %"
+                         "\n\n💵 ПРИБЫЛЬ"
+                         f"\n{result[-4]} {'₽' if currency == 'RUB ₽' else '$'} (в час)"
+                         f"\n{result[-3]} {'₽' if currency == 'RUB ₽' else '$'} (в день)"
+                         f"\n{result[-2]} {'₽' if currency == 'RUB ₽' else '$'} (в неделю)"
+                         f"\n{result[-1]} {'₽' if currency == 'RUB ₽' else '$'} (в месяц)"
+                         "\n\n🥇 НАГРАДА"
+                         f"\n{result[0]} {coin} (в час)"
+                         f"\n{result[1]} {coin} (в день)"
+                         f"\n{result[2]} {coin} (в неделю)"
+                         f"\n{result[3]} {coin} (в месяц)"
+                         "\n\n➕ ДОХОД"
+                         f"\n{result[4]} {'₽' if currency == 'RUB ₽' else '$'} (в час)"
+                         f"\n{result[5]} {'₽' if currency == 'RUB ₽' else '$'} (в день)"
+                         f"\n{result[6]} {'₽' if currency == 'RUB ₽' else '$'} (в неделю)"
+                         f"\n{result[7]} {'₽' if currency == 'RUB ₽' else '$'} (в месяц)"
+                         "\n\n➖ РАСХОДЫ"
+                         f"\n{result[8]} {'₽' if currency == 'RUB ₽' else '$'} (в час)"
+                         f"\n{result[9]} {'₽' if currency == 'RUB ₽' else '$'} (в день)"
+                         f"\n{result[10]} {'₽' if currency == 'RUB ₽' else '$'} (в неделю)"
+                         f"\n{result[11]} {'₽' if currency == 'RUB ₽' else '$'} (в месяц)",
+                    reply_markup=main_panel
+                )
 
                 date = str(datetime.now())
                 user = message.from_user.id
