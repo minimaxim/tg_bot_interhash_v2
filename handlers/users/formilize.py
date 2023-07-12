@@ -3,7 +3,7 @@ from datetime import datetime
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, FSInputFile, CallbackQuery
+from aiogram.types import Message, CallbackQuery
 
 from handlers.users.math import math
 from keyboards.inline.users import coin_ikb
