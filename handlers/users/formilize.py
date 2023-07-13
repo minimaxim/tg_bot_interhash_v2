@@ -109,7 +109,7 @@ async def get_hash(message: Message, state: FSMContext):
 
     if tip.isdecimal():
 
-        if message.text < '0':
+        if tip < '0':
             await message.answer(
                 text='Минимальная цена на электричество (кВт/ч) 0.01:',
                 reply_markup=main_panel
@@ -160,8 +160,6 @@ async def get_hash(message: Message, state: FSMContext):
                 )
     else:
         try:
-            float(tip)
-
             if message.text < '0.01':
                 await message.answer(
                     text='Минимальная цена на электричество (кВт/ч) 0.01:',
@@ -226,7 +224,7 @@ async def get_potr(message: Message, state: FSMContext):
     tip = message.text
 
     if tip.isdecimal():
-        if message.text < '0':
+        if tip < '0':
             await message.answer(
                 text='Укажите хешрейт больше 0.09:',
                 reply_markup=main_panel
@@ -254,9 +252,7 @@ async def get_potr(message: Message, state: FSMContext):
             )
     else:
         try:
-            float(tip)
-
-            if message.text < '0.1':
+            if tip < '0.1':
                 await message.answer(
                     text='Укажите хешрейт больше 0.09:',
                     reply_markup=main_panel
@@ -298,7 +294,7 @@ async def get_comm(message: Message, state: FSMContext):
     tip = message.text
 
     if tip.isdecimal():
-        if message.text < '0':
+        if tip < '0':
             await message.answer(
                 text='Укажите потребление (Ватт) больше 0.09:',
                 reply_markup=main_panel
@@ -325,9 +321,7 @@ async def get_comm(message: Message, state: FSMContext):
             )
     else:
         try:
-            float(tip)
-
-            if message.text < '0.1':
+            if tip < '0.1':
                 await message.answer(
                     text='Укажите потребление (Ватт) больше 0.09:',
                     reply_markup=main_panel
@@ -365,7 +359,7 @@ async def get_final(message: Message, state: FSMContext):
     tip = message.text
 
     if tip.isdecimal():
-        if message.text < '0':
+        if tip < '0':
             await message.answer(
                 text='Укажите комиссию пула (%) больше 0.1:',
                 reply_markup=main_panel
@@ -481,9 +475,7 @@ async def get_final(message: Message, state: FSMContext):
 
     else:
         try:
-            float(tip)
-
-            if message.text < '0.1':
+            if tip < '0.1':
                 await message.answer(
                     text='Укажите комиссию пула (%) больше 0.1:',
                     reply_markup=main_panel
